@@ -1,0 +1,217 @@
+schema_version: '1.0'
+proposal:
+  schema_version: '1.0'
+  id: prop_create_storyboard
+  kind: create_storyboard
+  created_at: '2026-11-13T15:00:00+00:00'
+  author: agent:claude
+  summary: 'Storyboard: one scene; four slow candidates, 48 fast ones, the best grid point, eleven refinement steps,
+    the fitted values.'
+  rationale: The owner supplied this clip as a project seed (animation.yaml, data, references) to be rebuilt 
+    as a manim8 project and rendered under the site's light and dark styles.
+  based_on_revision: working
+  in_response_to: []
+  uncertainties:
+    - Between two candidates the centre, size, R squared and prediction are blended (eased), as in the 
+      original scene; every value shown at rest is a row of candidates.csv.
+    - In the fast phase the original showed each candidate for 0.07 s with a hard cut between predictions; 
+      here the 48 candidates take 0.1 s each and the prediction blends from one to the next within those three
+      frames.
+  claims:
+    - statement: The time course is one measured voxel of prfmodel's example dataset 7t-aot-visual (sub-003), 
+        in per cent signal change; the predictions are Gaussian pRF model predictions, with amplitude and 
+        baseline by least squares per candidate.
+      source_id: timecourses
+      locator: citation of the source
+      basis: source
+    - statement: The best of the 147 grid points is (2, 1) deg with sigma 1 deg and R squared 0.84; refinement
+        ends at x 2.27, y 0.99 (0.995 in the table), sigma 0.85 deg, R squared 0.86.
+      source_id: candidates
+      locator: data/candidates.csv, seq 52 and 63
+      basis: source
+  targets:
+    - file: storyboard.yaml
+      document:
+        schema_version: '1.0'
+        project_id: grid_and_fit
+        based_on_animation_revision: working
+        scenes:
+          - id: fit
+            start_seconds: 0
+            end_seconds: 20
+            purpose: 'Try candidates, keep the best, refine it: the prediction settles onto the measured time course.'
+            patterns: []
+            objects:
+              - id: views
+                kind: custom
+                style_role: primary_signal
+                data:
+                  source: controls
+                  encoding:
+                    x: step
+                    y: result
+                  transforms:
+                    - op: scale
+                      column: step
+                      by:
+                        parameter: step
+                        default: 0
+                    - op: scale
+                      column: refine
+                      by:
+                        parameter: refine
+                        default: 0
+                    - op: scale
+                      column: result
+                      by:
+                        parameter: result
+                        default: 0
+                params:
+                  builder: grid_fit:build
+                  arguments: {}
+            actions:
+              - id: candidate_1
+                kind: vary_parameter
+                target: views
+                parameter: step
+                to: 1
+                at_seconds: 1.4
+                duration_seconds: 0.9
+                show_value: false
+              - id: candidate_2
+                kind: vary_parameter
+                target: views
+                parameter: step
+                to: 2
+                at_seconds: 2.8
+                duration_seconds: 0.9
+                show_value: false
+              - id: candidate_3
+                kind: vary_parameter
+                target: views
+                parameter: step
+                to: 3
+                at_seconds: 4.2
+                duration_seconds: 0.9
+                show_value: false
+              - id: fast_grid
+                kind: vary_parameter
+                target: views
+                parameter: step
+                to: 51
+                at_seconds: 5.6
+                duration_seconds: 4.8
+                show_value: false
+                easing: linear
+              - id: grid_best
+                kind: vary_parameter
+                target: views
+                parameter: step
+                to: 52
+                at_seconds: 10.4
+                duration_seconds: 0.8
+                show_value: false
+              - id: to_refinement
+                kind: vary_parameter
+                target: views
+                parameter: refine
+                to: 1
+                at_seconds: 11.8
+                duration_seconds: 0.5
+                show_value: false
+              - id: refine_steps
+                kind: vary_parameter
+                target: views
+                parameter: step
+                to: 63
+                at_seconds: 12.3
+                duration_seconds: 3.85
+                show_value: false
+                easing: linear
+              - id: show_result
+                kind: vary_parameter
+                target: views
+                parameter: result
+                to: 1
+                at_seconds: 16.6
+                duration_seconds: 0.5
+                show_value: false
+            snapshots:
+              - id: first_candidate
+                at_seconds: 1.2
+                description: "Candidate 0 at (-1, -3) deg, sigma 2 deg, R squared 0.00: a large circle low in the
+                  field, a nearly flat prediction on the measured time course; heading 'grid search'."
+              - id: slow_candidate
+                at_seconds: 3.9
+                description: Candidate 2 at rest; the kept best is dashed where the best so far lies; the 
+                  readouts show its x, y, sigma and R squared.
+              - id: fast_grid
+                at_seconds: 8.5
+                description: 'In the fast phase: the candidate between grid points, the dashed best so far elsewhere
+                  in the field.'
+              - id: grid_best
+                at_seconds: 11.5
+                description: 'The best grid point (2, 1) deg, sigma 1 deg, R squared 0.84: the prediction follows
+                  the measured peaks.'
+              - id: refining
+                at_seconds: 14.0
+                description: Heading 'refinement'; no dashed outline; the candidate between (2, 1) and the 
+                  optimum.
+              - id: result
+                at_seconds: 19.0
+                description: 'The optimum: x +2.27, y +0.99 (table 0.995), sigma 0.85 deg, R squared 0.86, and the
+                  line with the fitted values under the time course.'
+  touches_science: true
+applied_at: '2026-11-13T13:57:45+00:00'
+applied_to_revision: working
+diffs:
+  storyboard.yaml: "--- a/storyboard.yaml\n+++ b/storyboard.yaml\n@@ -0,0 +1,128 @@\n+schema_version: '1.0'\n+project_id:
+    grid_and_fit\n+based_on_animation_revision: working\n+scenes:\n+  - id: fit\n+    start_seconds: 0\n+    end_seconds:
+    20\n+    purpose: 'Try candidates, keep the best, refine it: the prediction settles onto the measured time course.'\n\
+    +    patterns: []\n+    objects:\n+      - id: views\n+        kind: custom\n+        style_role: primary_signal\n\
+    +        data:\n+          source: controls\n+          encoding:\n+            x: step\n+            y: result\n\
+    +          transforms:\n+            - op: scale\n+              column: step\n+              by:\n+       \
+    \         parameter: step\n+                default: 0\n+            - op: scale\n+              column: refine\n\
+    +              by:\n+                parameter: refine\n+                default: 0\n+            - op: scale\n\
+    +              column: result\n+              by:\n+                parameter: result\n+                default:
+    0\n+        params:\n+          builder: grid_fit:build\n+          arguments: {}\n+    actions:\n+      - id:
+    candidate_1\n+        kind: vary_parameter\n+        target: views\n+        parameter: step\n+        to: 1\n\
+    +        at_seconds: 1.4\n+        duration_seconds: 0.9\n+        show_value: false\n+      - id: candidate_2\n\
+    +        kind: vary_parameter\n+        target: views\n+        parameter: step\n+        to: 2\n+        at_seconds:
+    2.8\n+        duration_seconds: 0.9\n+        show_value: false\n+      - id: candidate_3\n+        kind: vary_parameter\n\
+    +        target: views\n+        parameter: step\n+        to: 3\n+        at_seconds: 4.2\n+        duration_seconds:
+    0.9\n+        show_value: false\n+      - id: fast_grid\n+        kind: vary_parameter\n+        target: views\n\
+    +        parameter: step\n+        to: 51\n+        at_seconds: 5.6\n+        duration_seconds: 4.8\n+     \
+    \   show_value: false\n+        easing: linear\n+      - id: grid_best\n+        kind: vary_parameter\n+   \
+    \     target: views\n+        parameter: step\n+        to: 52\n+        at_seconds: 10.4\n+        duration_seconds:
+    0.8\n+        show_value: false\n+      - id: to_refinement\n+        kind: vary_parameter\n+        target:
+    views\n+        parameter: refine\n+        to: 1\n+        at_seconds: 11.8\n+        duration_seconds: 0.5\n\
+    +        show_value: false\n+      - id: refine_steps\n+        kind: vary_parameter\n+        target: views\n\
+    +        parameter: step\n+        to: 63\n+        at_seconds: 12.3\n+        duration_seconds: 3.85\n+   \
+    \     show_value: false\n+        easing: linear\n+      - id: show_result\n+        kind: vary_parameter\n\
+    +        target: views\n+        parameter: result\n+        to: 1\n+        at_seconds: 16.6\n+        duration_seconds:
+    0.5\n+        show_value: false\n+    snapshots:\n+      - id: first_candidate\n+        at_seconds: 1.2\n+\
+    \        description: \"Candidate 0 at (-1, -3) deg, sigma 2 deg, R squared 0.00: a large circle low in the
+    field,\n+          a nearly flat prediction on the measured time course; heading 'grid search'.\"\n+      -
+    id: slow_candidate\n+        at_seconds: 3.9\n+        description: Candidate 2 at rest; the kept best is dashed
+    where the best so far lies; the readouts \n+          show its x, y, sigma and R squared.\n+      - id: fast_grid\n\
+    +        at_seconds: 8.5\n+        description: 'In the fast phase: the candidate between grid points, the dashed
+    best so far elsewhere in\n+          the field.'\n+      - id: grid_best\n+        at_seconds: 11.5\n+     \
+    \   description: 'The best grid point (2, 1) deg, sigma 1 deg, R squared 0.84: the prediction follows the measured\n\
+    +          peaks.'\n+      - id: refining\n+        at_seconds: 14.0\n+        description: Heading 'refinement';
+    no dashed outline; the candidate between (2, 1) and the optimum.\n+      - id: result\n+        at_seconds:
+    19.0\n+        description: 'The optimum: x +2.27, y +0.99 (table 0.995), sigma 0.85 deg, R squared 0.86, and
+    the line\n+          with the fitted values under the time course.'"
+scientific_review_required: true
+validation_warnings:
+  - "action 'fast_grid' moves at constant speed from its first frame to its last (easing: linear); the style asks
+    for slow in, slow out: omit `easing` to use `smooth`, or keep linear only for a motion that should read as mechanical"
+  - "action 'refine_steps' moves at constant speed from its first frame to its last (easing: linear); the style
+    asks for slow in, slow out: omit `easing` to use `smooth`, or keep linear only for a motion that should read
+    as mechanical"
+  - "action 'grid_best' moves 'views' 0.00s after 'fast_grid' has finished; the style asks for a rest of 0.5s so
+    the end state is seen before it changes again: start it later or lengthen its lead-in"
+  - "action 'refine_steps' moves 'views' 0.00s after 'to_refinement' has finished; the style asks for a rest of
+    0.5s so the end state is seen before it changes again: start it later or lengthen its lead-in"
+  - "action 'show_result' moves 'views' 0.45s after 'refine_steps' has finished; the style asks for a rest of 0.5s
+    so the end state is seen before it changes again: start it later or lengthen its lead-in"

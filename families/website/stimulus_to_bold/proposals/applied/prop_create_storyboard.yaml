@@ -1,0 +1,122 @@
+schema_version: '1.0'
+proposal:
+  schema_version: '1.0'
+  id: prop_create_storyboard
+  kind: create_storyboard
+  created_at: '2026-11-13T15:00:00+00:00'
+  author: agent:claude
+  summary: 'Storyboard: one scene; the cursor runs through the 300 s run at constant speed in 9.6 s, then fades.'
+  rationale: The owner supplied this clip as a project seed (animation.yaml, data, references) to be rebuilt 
+    as a manim8 project and rendered under the site's light and dark styles.
+  based_on_revision: working
+  in_response_to: []
+  uncertainties: []
+  claims:
+    - statement: The neural response is the overlap of the bar aperture with a Gaussian pRF at (2.5, 1.5) deg,
+        sigma 1 deg; the BOLD response is that through a two-gamma haemodynamic response. Both are simulated 
+        with prfmodel, not measured.
+      source_id: run
+      locator: data/run.csv; citation of the source
+      basis: source
+  targets:
+    - file: storyboard.yaml
+      document:
+        schema_version: '1.0'
+        project_id: stimulus_to_bold
+        based_on_animation_revision: working
+        scenes:
+          - id: run
+            start_seconds: 0
+            end_seconds: 12
+            purpose: 'One cursor through the run: the bar in the field, the neural trace at once, the BOLD trace
+              about 5 s later.'
+            patterns: []
+            objects:
+              - id: views
+                kind: custom
+                style_role: primary_signal
+                data:
+                  source: controls
+                  encoding:
+                    x: t
+                    y: cursor
+                  transforms:
+                    - op: scale
+                      column: t
+                      by:
+                        parameter: t
+                        default: 0
+                    - op: scale
+                      column: cursor
+                      by:
+                        parameter: cursor
+                        default: 1
+                params:
+                  builder: prf_run:build
+                  arguments: {}
+            actions:
+              - id: play_run
+                kind: vary_parameter
+                target: views
+                parameter: t
+                to: 300
+                at_seconds: 1.0
+                duration_seconds: 9.6
+                show_value: false
+                easing: linear
+              - id: cursor_leaves
+                kind: vary_parameter
+                target: views
+                parameter: cursor
+                to: 0
+                at_seconds: 10.8
+                duration_seconds: 0.4
+                show_value: false
+            snapshots:
+              - id: layout
+                at_seconds: 0.95
+                description: The field with fixation and the pRF outline; the strip of eight sweep bands with 
+                  arrows; empty neural and BOLD panels with axes; the cursor at 0 s.
+              - id: first_sweeps
+                at_seconds: 3.3
+                description: 'The cursor in the first blank: the bar has crossed twice, two neural peaks are drawn,
+                  the BOLD trace is in its undershoot.'
+              - id: mid_run
+                at_seconds: 6.4
+                description: The cursor near 170 s with a bar in the field; four neural peaks and the BOLD 
+                  peaks that follow them.
+              - id: end
+                at_seconds: 11.7
+                description: Both traces complete over 300 s; the cursor and its dots are gone; no bar in the 
+                  field.
+  touches_science: true
+applied_at: '2026-11-13T13:55:34+00:00'
+applied_to_revision: working
+diffs:
+  storyboard.yaml: "--- a/storyboard.yaml\n+++ b/storyboard.yaml\n@@ -0,0 +1,67 @@\n+schema_version: '1.0'\n+project_id:
+    stimulus_to_bold\n+based_on_animation_revision: working\n+scenes:\n+  - id: run\n+    start_seconds: 0\n+  \
+    \  end_seconds: 12\n+    purpose: 'One cursor through the run: the bar in the field, the neural trace at once,
+    the BOLD trace about 5\n+      s later.'\n+    patterns: []\n+    objects:\n+      - id: views\n+        kind:
+    custom\n+        style_role: primary_signal\n+        data:\n+          source: controls\n+          encoding:\n\
+    +            x: t\n+            y: cursor\n+          transforms:\n+            - op: scale\n+             \
+    \ column: t\n+              by:\n+                parameter: t\n+                default: 0\n+            -
+    op: scale\n+              column: cursor\n+              by:\n+                parameter: cursor\n+        \
+    \        default: 1\n+        params:\n+          builder: prf_run:build\n+          arguments: {}\n+    actions:\n\
+    +      - id: play_run\n+        kind: vary_parameter\n+        target: views\n+        parameter: t\n+     \
+    \   to: 300\n+        at_seconds: 1.0\n+        duration_seconds: 9.6\n+        show_value: false\n+       \
+    \ easing: linear\n+      - id: cursor_leaves\n+        kind: vary_parameter\n+        target: views\n+     \
+    \   parameter: cursor\n+        to: 0\n+        at_seconds: 10.8\n+        duration_seconds: 0.4\n+        show_value:
+    false\n+    snapshots:\n+      - id: layout\n+        at_seconds: 0.95\n+        description: The field with
+    fixation and the pRF outline; the strip of eight sweep bands with arrows; \n+          empty neural and BOLD
+    panels with axes; the cursor at 0 s.\n+      - id: first_sweeps\n+        at_seconds: 3.3\n+        description:
+    'The cursor in the first blank: the bar has crossed twice, two neural peaks are drawn, the\n+          BOLD
+    trace is in its undershoot.'\n+      - id: mid_run\n+        at_seconds: 6.4\n+        description: The cursor
+    near 170 s with a bar in the field; four neural peaks and the BOLD peaks that \n+          follow them.\n+ \
+    \     - id: end\n+        at_seconds: 11.7\n+        description: Both traces complete over 300 s; the cursor
+    and its dots are gone; no bar in the field."
+scientific_review_required: true
+validation_warnings:
+  - "action 'play_run' moves at constant speed from its first frame to its last (easing: linear); the style asks
+    for slow in, slow out: omit `easing` to use `smooth`, or keep linear only for a motion that should read as mechanical"
+  - "action 'cursor_leaves' moves 'views' 0.20s after 'play_run' has finished; the style asks for a rest of 0.5s
+    so the end state is seen before it changes again: start it later or lengthen its lead-in"

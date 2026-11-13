@@ -1,0 +1,67 @@
+schema_version: '1.0'
+project_id: stimulus_to_bold
+based_on_animation_revision: working
+scenes:
+  - id: run
+    start_seconds: 0
+    end_seconds: 12
+    purpose: 'One cursor through the run: the bar in the field, the neural trace at once, the BOLD trace about 5
+      s later.'
+    patterns: []
+    objects:
+      - id: views
+        kind: custom
+        style_role: primary_signal
+        data:
+          source: controls
+          encoding:
+            x: t
+            y: cursor
+          transforms:
+            - op: scale
+              column: t
+              by:
+                parameter: t
+                default: 0
+            - op: scale
+              column: cursor
+              by:
+                parameter: cursor
+                default: 1
+        params:
+          builder: prf_run:build
+          arguments: {}
+    actions:
+      - id: play_run
+        kind: vary_parameter
+        target: views
+        parameter: t
+        to: 300
+        at_seconds: 1.0
+        duration_seconds: 9.6
+        show_value: false
+        easing: linear
+      - id: cursor_leaves
+        kind: vary_parameter
+        target: views
+        parameter: cursor
+        to: 0
+        at_seconds: 10.8
+        duration_seconds: 0.4
+        show_value: false
+    snapshots:
+      - id: layout
+        at_seconds: 0.95
+        description: The field with fixation and the pRF outline; the strip of eight sweep bands with arrows; 
+          empty neural and BOLD panels with axes; the cursor at 0 s.
+      - id: first_sweeps
+        at_seconds: 3.3
+        description: 'The cursor in the first blank: the bar has crossed twice, two neural peaks are drawn, the
+          BOLD trace is in its undershoot.'
+      - id: mid_run
+        at_seconds: 6.4
+        description: The cursor near 170 s with a bar in the field; four neural peaks and the BOLD peaks that 
+          follow them.
+      - id: end
+        at_seconds: 11.7
+        description: Both traces complete over 300 s; the cursor and its dots are gone; no bar in the field.

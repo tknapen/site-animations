@@ -1,0 +1,146 @@
+schema_version: '1.0'
+id: prop_create_spec
+kind: create_spec
+created_at: '2026-11-13T15:00:00+00:00'
+author: agent:claude
+rationale: The owner supplied this clip as a project seed (animation.yaml, data, references) to be rebuilt as a manim8 project
+  and rendered under the site's light and dark styles.
+based_on_revision: working
+in_response_to: []
+summary: Specification from the owner's seed, with the site's light style, a 1920 by 960 frame and the controls table.
+uncertainties:
+- The seed asks for 1920 by 1080 and says to ask the owner; the site's clips are shown cropped to about 2:1, so this project
+  renders 1920 by 960 like the site's other clips, with the layout made for that frame.
+- 'The HRF glyph in the sixth box needs a curve that is not in data/: the original computed it with a helper that is not in
+  the bundle. The builder draws the usual difference of two gamma functions (peaks at 5 and 15 s, ratio 1/6) as a pictogram.
+  The owner should confirm that a pictogram is acceptable there.'
+- Box labels are set at the style's 30 px; the module boxes are 2.08 units wide (2.0 in the original) with 0.24 gaps (0.3)
+  so that 'transformation' fits.
+- manim8's storyboard contract lets vary_parameter drive a custom object only through a data binding whose transforms name
+  parameters, so the object binds a table of unit values (data/controls.csv). A workaround, not a use of data.
+claims: []
+touches_science: true
+targets:
+- file: animation.yaml
+  document:
+    schema_version: '1.0'
+    id: model_as_chain
+    title: The model as a chain of stages
+    sources:
+    - id: panel
+      type: csv
+      path: data/panel.csv
+      role: illustrative_data
+      citation: 'Synthetic: the Gaussian pRF voxel''s predicted BOLD for the first 150 s of the bar run, normalised to a peak
+        of 1, and the same plus Gaussian noise (SD 0.12, seed 20261106). Not a measurement.'
+    - id: brief
+      type: markdown
+      path: references/brief.md
+      role: explanatory_text
+    - id: original_scene
+      type: text
+      path: references/original_scene.py
+      role: composition_reference
+      citation: The hand-written Manim scene of the Coimbra pRF workshop; read for geometry and timing, do not run.
+    - id: original_layout
+      type: text
+      path: references/original_layout.py
+      role: composition_reference
+      citation: 'The row of seven boxes: positions, sizes, labels and the glyph in each box.'
+    - id: last_frame
+      type: image
+      path: references/last_frame.jpg
+      role: target_keyframe
+    - id: controls
+      type: csv
+      path: data/controls.csv
+      role: illustrative_data
+      citation: 'Unit values, one column per animated quantity; the object''s data binding scales each by the parameter that
+        a vary_parameter action drives. Not data: it is how a custom object declares its parameters.'
+    output:
+      duration_seconds: 15.5
+      width_px: 1920
+      height_px: 960
+      aspect_ratio: '2:1'
+      fps: 30
+      container: mp4
+      video_codec: h264
+      audio: none
+    style:
+      name: knapen_site
+      version: 0.1.0
+      overrides: {}
+    equations: []
+    audience: visitors of a lab website with a science background
+    objective: 'The general loop of computational modelling in neuroimaging (parameters and a stimulus feed a model whose
+      prediction is set against the data) opens its model box into a chain of stages: stimulus, features, spatial pooling,
+      transformation, neural dynamics, haemodynamic response, BOLD. The viewer sees that the fitted parameters belong to particular
+      stages, and follows one pulse from stimulus to predicted BOLD.'
+    scientific_constraints:
+    - id: stage_order
+      kind: hard
+      text: 'Seven boxes, left to right, with these labels: stimulus S; features Phi(S); spatial pooling; transformation f;
+        neural dynamics; HRF; BOLD. The opened model (dashed outline) holds boxes two to six.'
+    - id: theta_tags
+      kind: hard
+      text: 'Parameter tags (theta) sit on exactly four boxes: spatial pooling, transformation, neural dynamics and HRF.'
+    - id: loop_stays
+      kind: hard
+      text: 'The loop does not disappear when the box opens: it shrinks to the top of the frame and stays, with its model
+        box outlined and joined to the row by a light funnel.'
+    - id: model_colour_sparingly
+      kind: hard
+      text: Boxes are foreground outlines on a faint fill. The model colour (primary_signal) appears only on the Gaussian
+        inside the pooling box and on the prediction; the data are in foreground.
+    - id: panel_from_data
+      kind: hard
+      text: The prediction and the data in the loop's panel and in the BOLD box are the two columns of panel.csv.
+    timeline:
+    - id: loop
+      at_seconds: 0
+      tolerance_seconds: 0
+      kind: hard
+      instruction: 'The loop: boxes ''parameters theta'' and ''stimulus'' above a ''model'' box with a gear, arrows into it,
+        and below it a panel with the prediction on the data. Dots travel the arrows and the gear turns a quarter.'
+    - id: shrink
+      at_seconds: 2.6
+      tolerance_seconds: 0.5
+      kind: preferred
+      instruction: The loop shrinks to about 45 per cent and moves to the top centre.
+    - id: open
+      at_seconds: 3.9
+      tolerance_seconds: 0.5
+      kind: preferred
+      instruction: The model box gets a heavier outline; a funnel opens down to a dashed outline; the seven boxes fade in
+        one after another, then the arrows between them.
+    - id: tags
+      at_seconds: 7.3
+      tolerance_seconds: 0.5
+      kind: preferred
+      instruction: A copy of the theta box drops and splits into four tags above the fitted stages.
+    - id: pulse
+      at_seconds: 9.3
+      tolerance_seconds: 0.5
+      kind: preferred
+      instruction: A dot runs at constant speed from the stimulus box to the BOLD box in about 3 s; each stage darkens while
+        the dot is in it.
+    - id: prediction
+      at_seconds: 12.5
+      tolerance_seconds: 0.5
+      kind: preferred
+      instruction: The prediction in the BOLD box is drawn over the data; hold to the end.
+    direction:
+      tone: Plain, precise, unhurried
+      avoid:
+      - Titles or captions inside the clip
+      - Colour on the boxes themselves
+      prefer:
+      - 'Colour by role only: outlines, labels, arrows and the pulse in foreground; box fill in selection or neutral; prediction
+        in primary_signal'
+      - Identical geometry and timing under the light and the dark style
+    extensions:
+      website:
+        themes:
+        - light
+        - dark
+        poster: last_frame

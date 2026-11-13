@@ -1,0 +1,67 @@
+schema_version: '1.0'
+project_id: fields_to_map
+based_on_animation_revision: working
+scenes:
+  - id: map
+    start_seconds: 0
+    end_seconds: 18
+    purpose: Fits arrive one voxel at a time; colour bands appear on the sheet; recoloured by direction they 
+      run the other way.
+    patterns: []
+    objects:
+      - id: views
+        kind: custom
+        style_role: primary_signal
+        data:
+          source: controls
+          encoding:
+            x: arrive
+            y: angle
+          transforms:
+            - op: scale
+              column: arrive
+              by:
+                parameter: arrive
+                default: 0
+            - op: scale
+              column: angle
+              by:
+                parameter: angle
+                default: 0
+        params:
+          builder: field_map:build
+          arguments: {}
+    actions:
+      - id: fits_arrive
+        kind: vary_parameter
+        target: views
+        parameter: arrive
+        to: 1
+        at_seconds: 1.0
+        duration_seconds: 11.0
+        show_value: false
+        easing: linear
+      - id: to_polar_angle
+        kind: vary_parameter
+        target: views
+        parameter: angle
+        to: 1
+        at_seconds: 13.4
+        duration_seconds: 2.5
+        show_value: false
+    snapshots:
+      - id: layout
+        at_seconds: 0.95
+        description: "The half field with meridian and fixation, the empty sheet area, both labels and the key line
+          'color: distance from fixation'."
+      - id: arriving
+        at_seconds: 5.0
+        description: 'About a third of the voxels: squares fill the sheet from one edge, dots near fixation, both
+          in the eccentricity colours.'
+      - id: eccentricity
+        at_seconds: 12.9
+        description: 'All 690 squares and dots coloured by distance from fixation: bands across the sheet.'
+      - id: polar_angle
+        at_seconds: 17.0
+        description: 'The same squares and dots coloured by direction from fixation, the key line changed: the bands
+          run the other way.'

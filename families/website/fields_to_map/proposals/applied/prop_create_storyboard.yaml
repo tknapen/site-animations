@@ -1,0 +1,124 @@
+schema_version: '1.0'
+proposal:
+  schema_version: '1.0'
+  id: prop_create_storyboard
+  kind: create_storyboard
+  created_at: '2026-11-13T15:00:00+00:00'
+  author: agent:claude
+  summary: 'Storyboard: one scene; 690 voxels arrive in order over 11 s coloured by eccentricity, then all change
+    to the polar-angle colours.'
+  rationale: The owner supplied this clip as a project seed (animation.yaml, data, references) to be rebuilt 
+    as a manim8 project and rendered under the site's light and dark styles.
+  based_on_revision: working
+  in_response_to: []
+  uncertainties:
+    - 'Colour ramps are built from palette roles of the active style: eccentricity from emphasis through primary_signal
+      to theme_perception (0 to 6.5 deg), polar angle from comparison through theme_perception to primary_signal
+      (+90 to -90 deg). The original used four stops for eccentricity; the site palette has three roles that order
+      in lightness. The owner should look at both ramps under both styles.'
+    - Eccentricities above 6.5 deg (up to 6.9) take the colour of 6.5 deg, as in the original scene.
+  claims:
+    - statement: The 690 voxels are simulated on a model sheet of early visual cortex and each is fitted on 
+        its own with prfmodel; the dots are the fitted centres. Not a measurement.
+      source_id: voxels
+      locator: citation of the source
+      basis: source
+  targets:
+    - file: storyboard.yaml
+      document:
+        schema_version: '1.0'
+        project_id: fields_to_map
+        based_on_animation_revision: working
+        scenes:
+          - id: map
+            start_seconds: 0
+            end_seconds: 18
+            purpose: Fits arrive one voxel at a time; colour bands appear on the sheet; recoloured by 
+              direction they run the other way.
+            patterns: []
+            objects:
+              - id: views
+                kind: custom
+                style_role: primary_signal
+                data:
+                  source: controls
+                  encoding:
+                    x: arrive
+                    y: angle
+                  transforms:
+                    - op: scale
+                      column: arrive
+                      by:
+                        parameter: arrive
+                        default: 0
+                    - op: scale
+                      column: angle
+                      by:
+                        parameter: angle
+                        default: 0
+                params:
+                  builder: field_map:build
+                  arguments: {}
+            actions:
+              - id: fits_arrive
+                kind: vary_parameter
+                target: views
+                parameter: arrive
+                to: 1
+                at_seconds: 1.0
+                duration_seconds: 11.0
+                show_value: false
+                easing: linear
+              - id: to_polar_angle
+                kind: vary_parameter
+                target: views
+                parameter: angle
+                to: 1
+                at_seconds: 13.4
+                duration_seconds: 2.5
+                show_value: false
+            snapshots:
+              - id: layout
+                at_seconds: 0.95
+                description: "The half field with meridian and fixation, the empty sheet area, both labels and the
+                  key line 'color: distance from fixation'."
+              - id: arriving
+                at_seconds: 5.0
+                description: 'About a third of the voxels: squares fill the sheet from one edge, dots near fixation,
+                  both in the eccentricity colours.'
+              - id: eccentricity
+                at_seconds: 12.9
+                description: 'All 690 squares and dots coloured by distance from fixation: bands across the sheet.'
+              - id: polar_angle
+                at_seconds: 17.0
+                description: 'The same squares and dots coloured by direction from fixation, the key line changed:
+                  the bands run the other way.'
+  touches_science: true
+applied_at: '2026-11-13T13:57:46+00:00'
+applied_to_revision: working
+diffs:
+  storyboard.yaml: "--- a/storyboard.yaml\n+++ b/storyboard.yaml\n@@ -0,0 +1,67 @@\n+schema_version: '1.0'\n+project_id:
+    fields_to_map\n+based_on_animation_revision: working\n+scenes:\n+  - id: map\n+    start_seconds: 0\n+    end_seconds:
+    18\n+    purpose: Fits arrive one voxel at a time; colour bands appear on the sheet; recoloured by direction
+    they \n+      run the other way.\n+    patterns: []\n+    objects:\n+      - id: views\n+        kind: custom\n\
+    +        style_role: primary_signal\n+        data:\n+          source: controls\n+          encoding:\n+  \
+    \          x: arrive\n+            y: angle\n+          transforms:\n+            - op: scale\n+           \
+    \   column: arrive\n+              by:\n+                parameter: arrive\n+                default: 0\n+ \
+    \           - op: scale\n+              column: angle\n+              by:\n+                parameter: angle\n\
+    +                default: 0\n+        params:\n+          builder: field_map:build\n+          arguments: {}\n\
+    +    actions:\n+      - id: fits_arrive\n+        kind: vary_parameter\n+        target: views\n+        parameter:
+    arrive\n+        to: 1\n+        at_seconds: 1.0\n+        duration_seconds: 11.0\n+        show_value: false\n\
+    +        easing: linear\n+      - id: to_polar_angle\n+        kind: vary_parameter\n+        target: views\n\
+    +        parameter: angle\n+        to: 1\n+        at_seconds: 13.4\n+        duration_seconds: 2.5\n+    \
+    \    show_value: false\n+    snapshots:\n+      - id: layout\n+        at_seconds: 0.95\n+        description:
+    \"The half field with meridian and fixation, the empty sheet area, both labels and the key line\n+         \
+    \ 'color: distance from fixation'.\"\n+      - id: arriving\n+        at_seconds: 5.0\n+        description:
+    'About a third of the voxels: squares fill the sheet from one edge, dots near fixation, both\n+          in
+    the eccentricity colours.'\n+      - id: eccentricity\n+        at_seconds: 12.9\n+        description: 'All
+    690 squares and dots coloured by distance from fixation: bands across the sheet.'\n+      - id: polar_angle\n\
+    +        at_seconds: 17.0\n+        description: 'The same squares and dots coloured by direction from fixation,
+    the key line changed: the bands\n+          run the other way.'"
+scientific_review_required: true
+validation_warnings:
+  - "action 'fits_arrive' moves at constant speed from its first frame to its last (easing: linear); the style asks
+    for slow in, slow out: omit `easing` to use `smooth`, or keep linear only for a motion that should read as mechanical"

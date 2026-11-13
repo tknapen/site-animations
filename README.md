@@ -23,6 +23,7 @@ fonts/                    Public Sans and Space Grotesk (SIL Open Font License) 
 families/website/         one manim8 project per clip, and the pinned render environment (uv.lock)
 families/website/components/   drawing code shared by clips (custom manim8 builders)
 sim/                      simulations that compute the curves some clips draw (prfmodel)
+tools/checkpoints.py      renders every checkpoint of a clip in both styles, as stills and one review sheet
 tools/render.py           renders every clip in both styles and prepares the files for the site
 out/                      the prepared files (not committed)
 ```
@@ -33,6 +34,10 @@ out/                      the prepared files (not committed)
 |---|---|---|
 | `dn_bar_sweep` | The DN pRF model of Aqil, Knapen and Dumoulin (2021) with both pools drawn on the pRF. A bar crosses the visual field; numerator (activation pool), denominator (normalization pool) and response are traced against the bar's position. Curves simulated with prfmodel. | signed off by the author on 13 November 2026; final render in the website repository |
 | `dn_size_tuning` | The same model with a disc growing around the pRF centre: the response peaks and then falls (oversaturation). The normalization constant d and the size ratio σ₂/σ₁ then vary one at a time. Curves simulated with prfmodel. | signed off by the author on 13 November 2026; final render in the website repository |
+| `stimulus_to_bold` | One cursor through a 300 s bar-mapping run: the bar over a fixed pRF in the visual field, the stimulus strip, the predicted neural response and the predicted BOLD response. Simulated with prfmodel. | draft from the owner's seed; checkpoints awaiting review |
+| `model_as_chain` | The modelling loop (parameters and stimulus into a model, its prediction on the data) opens its model box into seven stages, four of them with fitted parameters; a pulse runs from stimulus to BOLD. Synthetic data. | draft from the owner's seed; checkpoints awaiting review |
+| `grid_and_fit` | Fitting a Gaussian pRF to one measured voxel (prfmodel's example dataset 7t-aot-visual): candidates on a coarse grid with their predictions and R², the best one kept, then refinement to the optimum. | draft from the owner's seed; checkpoints awaiting review |
+| `fields_to_map` | 690 simulated voxels fitted one at a time: a dot at each fitted pRF centre and a square on a sheet of cortex, coloured by distance and then by direction from fixation. | draft from the owner's seed; checkpoints awaiting review |
 | `divisive_normalization` | An earlier draft from the equation alone: the activation constant b and the pRF profile, the normalization constant d and the response function. No pools, no stimulus. | draft, not on the website |
 
 ## Set up
@@ -51,7 +56,16 @@ manim8 family env sync families/website
 
 The family takes Manim and manim8's render side from the same commit; `families/website/uv.lock` pins them.
 
-## Render
+## Review, then render
+
+```bash
+python3 tools/checkpoints.py grid_and_fit
+```
+
+This renders every checkpoint of the storyboard under both styles and writes the stills to
+`out/checkpoints/<project>/` and one sheet, a row per checkpoint with light beside dark, to
+`out/checkpoints/<project>.png`. Checkpoints are the animation itself fast-forwarded to the named times.
+Look at them under both styles before a final render: thin strokes and small text first.
 
 ```bash
 python3 tools/render.py
@@ -71,7 +85,7 @@ The site then needs an entry for the clip in its `_data/clips.yml` (title and ca
 length from `out/clips.yml`) and `{% include clip.html id="divisive-normalization" %}` on the page where it
 belongs. The dark render is picked up by itself.
 
-## Simulated curves
+## Data and custom builders
 
 The two `dn_` clips draw curves that are computed, not typed in. `sim/simulate_dn.py` runs prfmodel's
 `DivNormGaussian2DPRFModel` (no impulse response, no scaling) for a bar stepping across the field and for a
@@ -91,7 +105,14 @@ uv pip install --python sim/.venv/bin/python -r sim/requirements.txt
 KERAS_BACKEND=jax sim/.venv/bin/python sim/simulate_dn.py
 ```
 
-`families/website/components/dn_views.py` draws them: the visual field with the pRF and its two pools on
+The four pRF clips (`stimulus_to_bold`, `model_as_chain`, `grid_and_fit`, `fields_to_map`) were hand-written
+Manim scenes for lectures. Each came here as a seed (specification, data, the original scene's source and
+last frame, kept in `references/`) and was rebuilt as a manim8 project. Their builders are `prf_run.py`,
+`model_chain.py`, `grid_fit.py` and `field_map.py` in `families/website/components/`, on the shared helpers
+of `site_kit.py`. A builder draws and the storyboard times: every moving quantity is a parameter that a
+`vary_parameter` action drives, and colours are palette roles, so the same scene renders under both styles.
+
+`families/website/components/dn_views.py` draws the `dn_` clips: the visual field with the pRF and its two pools on
 the left, the traces on the right. It is a manim8 `custom` builder that returns a parametric component, so
 `vary_parameter` actions move the stimulus, d and the size ratio. manim8 (at the pinned commit) accepts such
 an action on a custom object only if the object has a data binding whose transforms name parameters; each

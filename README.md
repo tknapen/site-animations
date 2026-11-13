@@ -38,6 +38,7 @@ out/                      the prepared files (not committed)
 | `model_as_chain` | The modelling loop (parameters and stimulus into a model, its prediction on the data) opens its model box into seven stages, four of them with fitted parameters; a pulse runs from stimulus to BOLD. Synthetic data. | checkpoints signed off by the owner on 13 November 2026; final render in the website repository |
 | `grid_and_fit` | Fitting a Gaussian pRF to one measured voxel (prfmodel's example dataset 7t-aot-visual): candidates on a coarse grid with their predictions and R², the best one kept, then refinement to the optimum. | checkpoints signed off by the owner on 13 November 2026; final render in the website repository |
 | `fields_to_map` | 690 simulated voxels fitted one at a time: a dot at each fitted pRF centre and a square on a sheet of cortex, coloured by distance and then by direction from fixation. | checkpoints signed off by the owner on 13 November 2026; final render in the website repository |
+| `connective_field` | A connective field fitted to one simulated target voxel: a Gaussian patch on the model sheet of V1 tries positions and sizes until its weighted sum follows the target, which inherits the patch's place in the visual field. Simulated with prfmodel (`sim/simulate_cf.py`). | draft from the website review of 13 November 2026; checkpoints awaiting review |
 | `divisive_normalization` | An earlier draft from the equation alone: the activation constant b and the pRF profile, the normalization constant d and the response function. No pools, no stimulus. | draft, not on the website |
 
 ## Set up
@@ -104,6 +105,11 @@ uv pip install --python sim/.venv/bin/python -r sim/requirements.txt
 ```bash
 KERAS_BACKEND=jax sim/.venv/bin/python sim/simulate_dn.py
 ```
+
+`sim/simulate_cf.py` does the same for `connective_field`: it predicts the BOLD response of the 690 simulated
+V1 voxels of `fields_to_map` to the bar run of `stimulus_to_bold`, makes a target voxel with prfmodel's
+`GaussianCFModel`, fits a connective field to it by grid search and refinement, and writes the candidates and
+their predictions. `cf_fit.py` draws it.
 
 The four pRF clips (`stimulus_to_bold`, `model_as_chain`, `grid_and_fit`, `fields_to_map`) were hand-written
 Manim scenes for lectures. Each came here as a seed (specification, data, the original scene's source and

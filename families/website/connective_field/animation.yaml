@@ -1,0 +1,115 @@
+schema_version: '1.0'
+id: connective_field
+title: 'A connective field: explaining a voxel from a patch of V1'
+sources:
+  - id: voxels
+    type: csv
+    path: data/voxels.csv
+    role: illustrative_data
+    citation: 'The model sheet of V1 of the clip fields_to_map: 690 simulated voxels with their fitted pRFs. Simulated
+      with prfmodel 0.2.0 by sim/simulate_cf.py. Not a measurement.'
+  - id: candidates
+    type: csv
+    path: data/candidates.csv
+    role: illustrative_data
+    citation: 'The candidates in the order the clip shows them: 3 slow, 36 fast, the best of a grid of 225 (75 centres,
+      sizes 1, 2 and 4 voxels), then the refinement steps. Simulated with prfmodel 0.2.0 by sim/simulate_cf.py.
+      Not a measurement.'
+  - id: timecourses
+    type: csv
+    path: data/timecourses.csv
+    role: illustrative_data
+    citation: "Column 'target': a voxel simulated as a Gaussian-weighted sum of the source voxels' predicted BOLD
+      for a 300 s bar run, plus Gaussian noise. Columns p00, p01, ...: the prediction of each candidate. Simulated
+      with prfmodel 0.2.0 by sim/simulate_cf.py. Not a measurement."
+  - id: controls
+    type: csv
+    path: data/controls.csv
+    role: illustrative_data
+    citation: Unit values, one column per animated quantity; the object's data binding scales each by the 
+      parameter that a vary_parameter action drives. Not data.
+  - id: sources_note
+    type: markdown
+    path: references/sources.md
+    role: scientific_reference
+    citation: Haak et al. (2013) NeuroImage 66, 376-384, doi:10.1016/j.neuroimage.2012.10.037; Knapen (2021) 
+      PNAS 118(2), e2017032118, doi:10.1073/pnas.2017032118.
+  - id: brief
+    type: markdown
+    path: references/brief.md
+    role: explanatory_text
+output:
+  duration_seconds: 15
+  width_px: 1920
+  height_px: 960
+  aspect_ratio: 2:1
+  fps: 30
+  container: mp4
+  video_codec: h264
+  audio: none
+style:
+  name: knapen_site
+  version: 0.1.0
+  overrides: {}
+equations: []
+audience: visitors of a lab website with a science background
+objective: A connective field model explains one voxel's time course from a Gaussian patch of activity on a 
+  source map, V1. The patch tries positions and sizes on the sheet while its prediction is laid on the 
+  target's time course; the best is kept and refined. The target inherits the visual field position of the 
+  patch's centre voxel. No stimulus description enters the model.
+scientific_constraints:
+  - id: candidates_exact
+    kind: hard
+    text: Every candidate shown is a row of candidates.csv, in seq order, at its centre voxel and size; its 
+      prediction is the matching column of timecourses.csv; the R squared readout is its r2 to two decimals.
+  - id: weights_shown
+    kind: hard
+    text: The ink of the sheet's squares follows the candidate's Gaussian weights; the ring is at one standard
+      deviation.
+  - id: inherited_position
+    kind: hard
+    text: The visual field position shown is the fitted pRF centre of the candidate's centre voxel, from 
+      candidates.csv.
+  - id: size_in_voxels
+    kind: hard
+    text: 'The size is given in voxels of the model sheet, not in millimeters: the sheet has no physical scale.'
+  - id: simulation_label
+    kind: hard
+    text: The sheet and the target are labelled as simulated; the connective field the target was simulated 
+      with is shown only at the end, labelled as such.
+timeline:
+  - id: layout
+    at_seconds: 0
+    tolerance_seconds: 0
+    kind: hard
+    instruction: The sheet with the first candidate, the target time course with its prediction, the visual 
+      field inset.
+  - id: fast_grid
+    at_seconds: 4.2
+    tolerance_seconds: 0.7
+    kind: preferred
+    instruction: 36 candidates at about 0.1 s each.
+  - id: refinement
+    at_seconds: 9.2
+    tolerance_seconds: 0.7
+    kind: preferred
+    instruction: The heading becomes 'refinement'; the patch moves to the optimum.
+  - id: result
+    at_seconds: 12.0
+    tolerance_seconds: 0.7
+    kind: preferred
+    instruction: The simulated connective field appears as a dashed ring; hold to the end.
+direction:
+  tone: Plain, precise, unhurried
+  avoid:
+    - Titles inside the clip
+    - A physical scale for the sheet
+  prefer:
+    - Colour by role only
+    - Identical geometry and timing under the light and the dark style
+extensions:
+  website:
+    themes:
+      - light
+      - dark
+    poster: last_frame

@@ -1,0 +1,218 @@
+schema_version: '1.0'
+proposal:
+  schema_version: '1.0'
+  id: prop_create_spec
+  kind: create_spec
+  created_at: '2026-11-13T20:00:00+00:00'
+  author: agent:claude
+  summary: 'Specification: a connective field fitted to a simulated target voxel on the model sheet of V1; 15 s
+    at 2:1.'
+  rationale: Proposed in the website review of 13 November 2026 and approved by the site's owner 
+    (references/brief.md).
+  based_on_revision: working
+  in_response_to: []
+  uncertainties:
+    - "Everything is simulated: sources are the 690 fitted pRFs of fields_to_map responding to the bar run of stimulus_to_bold
+      (prfmodel Gaussian2DPRFModel, Glover two-gamma response without its derivative); the target is prfmodel's
+      GaussianCFModel around the voxel whose pRF is nearest eccentricity 3 deg, polar angle 35 deg, size 2.0 voxels,
+      plus noise of 0.45 signal SDs (seed 20261113). The owner should confirm these choices."
+    - The source activity comes from a bar run although the page stresses that the method needs only brain 
+      activity (movies, rest). A bar run is what the simulated voxels of the other clips already have; the 
+      clip never shows the stimulus.
+    - Distances on the sheet are Euclidean, in voxels of the model sheet. Real connective fields use distance 
+      along the cortical surface in millimeters; the sheet has no physical scale, so the clip says voxels.
+    - The fit recovers the simulated centre voxel and a size of 1.7 voxels against a simulated 2.0; the clip 
+      shows both at the end.
+    - Refinement here is a search over neighbouring centre voxels with the size optimised at each, because 
+      prfmodel's centre is an index found by grid search; it takes two steps.
+    - manim8's storyboard contract lets vary_parameter drive a custom object only through a data binding whose
+      transforms name parameters, so the object binds a table of unit values (data/controls.csv). A 
+      workaround, not a use of data.
+  claims:
+    - statement: A connective field model predicts a target voxel's time course as the Gaussian-weighted sum 
+        of the time courses on a source surface, with a centre on that surface and a size.
+      source_id: sources_note
+      locator: Haak et al. (2013); prfmodel GaussianCFModel
+      basis: source
+    - statement: With V1 as the source, the target inherits the visual field position of the connective 
+        field's centre.
+      source_id: sources_note
+      locator: Knapen (2021); the site's page on computational models, 'From brain to brain'
+      basis: source
+    - statement: In this simulation the best grid point has R squared 0.81 and the refined fit 0.83, at the 
+        simulated centre voxel (eccentricity 3.1 deg, polar angle 34.8 deg) with size 1.7 voxels.
+      source_id: candidates
+      locator: data/candidates.csv, seq 39 and 41; data/parameters.json
+      basis: source
+  targets:
+    - file: animation.yaml
+      document:
+        schema_version: '1.0'
+        id: connective_field
+        title: 'A connective field: explaining a voxel from a patch of V1'
+        sources:
+          - id: voxels
+            type: csv
+            path: data/voxels.csv
+            role: illustrative_data
+            citation: 'The model sheet of V1 of the clip fields_to_map: 690 simulated voxels with their fitted pRFs.
+              Simulated with prfmodel 0.2.0 by sim/simulate_cf.py. Not a measurement.'
+          - id: candidates
+            type: csv
+            path: data/candidates.csv
+            role: illustrative_data
+            citation: 'The candidates in the order the clip shows them: 3 slow, 36 fast, the best of a grid of 225
+              (75 centres, sizes 1, 2 and 4 voxels), then the refinement steps. Simulated with prfmodel 0.2.0 by
+              sim/simulate_cf.py. Not a measurement.'
+          - id: timecourses
+            type: csv
+            path: data/timecourses.csv
+            role: illustrative_data
+            citation: "Column 'target': a voxel simulated as a Gaussian-weighted sum of the source voxels' predicted
+              BOLD for a 300 s bar run, plus Gaussian noise. Columns p00, p01, ...: the prediction of each candidate.
+              Simulated with prfmodel 0.2.0 by sim/simulate_cf.py. Not a measurement."
+          - id: controls
+            type: csv
+            path: data/controls.csv
+            role: illustrative_data
+            citation: Unit values, one column per animated quantity; the object's data binding scales each by 
+              the parameter that a vary_parameter action drives. Not data.
+          - id: sources_note
+            type: markdown
+            path: references/sources.md
+            role: scientific_reference
+            citation: Haak et al. (2013) NeuroImage 66, 376-384, doi:10.1016/j.neuroimage.2012.10.037; Knapen 
+              (2021) PNAS 118(2), e2017032118, doi:10.1073/pnas.2017032118.
+          - id: brief
+            type: markdown
+            path: references/brief.md
+            role: explanatory_text
+        output:
+          duration_seconds: 15
+          width_px: 1920
+          height_px: 960
+          aspect_ratio: 2:1
+          fps: 30
+          container: mp4
+          video_codec: h264
+          audio: none
+        style:
+          name: knapen_site
+          version: 0.1.0
+          overrides: {}
+        equations: []
+        audience: visitors of a lab website with a science background
+        objective: A connective field model explains one voxel's time course from a Gaussian patch of activity
+          on a source map, V1. The patch tries positions and sizes on the sheet while its prediction is laid 
+          on the target's time course; the best is kept and refined. The target inherits the visual field 
+          position of the patch's centre voxel. No stimulus description enters the model.
+        scientific_constraints:
+          - id: candidates_exact
+            kind: hard
+            text: Every candidate shown is a row of candidates.csv, in seq order, at its centre voxel and 
+              size; its prediction is the matching column of timecourses.csv; the R squared readout is its r2 
+              to two decimals.
+          - id: weights_shown
+            kind: hard
+            text: The ink of the sheet's squares follows the candidate's Gaussian weights; the ring is at one 
+              standard deviation.
+          - id: inherited_position
+            kind: hard
+            text: The visual field position shown is the fitted pRF centre of the candidate's centre voxel, 
+              from candidates.csv.
+          - id: size_in_voxels
+            kind: hard
+            text: 'The size is given in voxels of the model sheet, not in millimeters: the sheet has no physical
+              scale.'
+          - id: simulation_label
+            kind: hard
+            text: The sheet and the target are labelled as simulated; the connective field the target was 
+              simulated with is shown only at the end, labelled as such.
+        timeline:
+          - id: layout
+            at_seconds: 0
+            tolerance_seconds: 0
+            kind: hard
+            instruction: The sheet with the first candidate, the target time course with its prediction, the 
+              visual field inset.
+          - id: fast_grid
+            at_seconds: 4.2
+            tolerance_seconds: 0.7
+            kind: preferred
+            instruction: 36 candidates at about 0.1 s each.
+          - id: refinement
+            at_seconds: 9.2
+            tolerance_seconds: 0.7
+            kind: preferred
+            instruction: The heading becomes 'refinement'; the patch moves to the optimum.
+          - id: result
+            at_seconds: 12.0
+            tolerance_seconds: 0.7
+            kind: preferred
+            instruction: The simulated connective field appears as a dashed ring; hold to the end.
+        direction:
+          tone: Plain, precise, unhurried
+          avoid:
+            - Titles inside the clip
+            - A physical scale for the sheet
+          prefer:
+            - Colour by role only
+            - Identical geometry and timing under the light and the dark style
+        extensions:
+          website:
+            themes:
+              - light
+              - dark
+            poster: last_frame
+  touches_science: true
+applied_at: '2026-11-13T19:15:47+00:00'
+applied_to_revision: working
+diffs:
+  animation.yaml: "--- a/animation.yaml\n+++ b/animation.yaml\n@@ -1,25 +1,115 @@\n-schema_version: \"1.0\"\n+schema_version:
+    '1.0'\n id: connective_field\n-title: \"Connective field\"\n-sources: []\n+title: 'A connective field: explaining
+    a voxel from a patch of V1'\n+sources:\n+  - id: voxels\n+    type: csv\n+    path: data/voxels.csv\n+    role:
+    illustrative_data\n+    citation: 'The model sheet of V1 of the clip fields_to_map: 690 simulated voxels with
+    their fitted pRFs. Simulated\n+      with prfmodel 0.2.0 by sim/simulate_cf.py. Not a measurement.'\n+  - id:
+    candidates\n+    type: csv\n+    path: data/candidates.csv\n+    role: illustrative_data\n+    citation: 'The
+    candidates in the order the clip shows them: 3 slow, 36 fast, the best of a grid of 225 (75 centres,\n+    \
+    \  sizes 1, 2 and 4 voxels), then the refinement steps. Simulated with prfmodel 0.2.0 by sim/simulate_cf.py.\n\
+    +      Not a measurement.'\n+  - id: timecourses\n+    type: csv\n+    path: data/timecourses.csv\n+    role:
+    illustrative_data\n+    citation: \"Column 'target': a voxel simulated as a Gaussian-weighted sum of the source
+    voxels' predicted BOLD\n+      for a 300 s bar run, plus Gaussian noise. Columns p00, p01, ...: the prediction
+    of each candidate. Simulated\n+      with prfmodel 0.2.0 by sim/simulate_cf.py. Not a measurement.\"\n+  - id:
+    controls\n+    type: csv\n+    path: data/controls.csv\n+    role: illustrative_data\n+    citation: Unit values,
+    one column per animated quantity; the object's data binding scales each by the \n+      parameter that a vary_parameter
+    action drives. Not data.\n+  - id: sources_note\n+    type: markdown\n+    path: references/sources.md\n+  \
+    \  role: scientific_reference\n+    citation: Haak et al. (2013) NeuroImage 66, 376-384, doi:10.1016/j.neuroimage.2012.10.037;
+    Knapen (2021) \n+      PNAS 118(2), e2017032118, doi:10.1073/pnas.2017032118.\n+  - id: brief\n+    type: markdown\n\
+    +    path: references/brief.md\n+    role: explanatory_text\n output:\n   duration_seconds: 15\n   width_px:
+    1920\n-  height_px: 1080\n-  aspect_ratio: \"16:9\"\n+  height_px: 960\n+  aspect_ratio: 2:1\n   fps: 30\n \
+    \  container: mp4\n   video_codec: h264\n   audio: none\n style:\n   name: knapen_site\n-  version: \"0.1.0\"\
+    \n+  version: 0.1.0\n   overrides: {}\n equations: []\n-objective: \"One mechanism in a brief clip: say what
+    moves, and what the viewer should see it do.\"\n-scientific_constraints: []\n-timeline: []\n+audience: visitors
+    of a lab website with a science background\n+objective: A connective field model explains one voxel's time course
+    from a Gaussian patch of activity on a \n+  source map, V1. The patch tries positions and sizes on the sheet
+    while its prediction is laid on the \n+  target's time course; the best is kept and refined. The target inherits
+    the visual field position of the \n+  patch's centre voxel. No stimulus description enters the model.\n+scientific_constraints:\n\
+    +  - id: candidates_exact\n+    kind: hard\n+    text: Every candidate shown is a row of candidates.csv, in
+    seq order, at its centre voxel and size; its \n+      prediction is the matching column of timecourses.csv;
+    the R squared readout is its r2 to two decimals.\n+  - id: weights_shown\n+    kind: hard\n+    text: The ink
+    of the sheet's squares follows the candidate's Gaussian weights; the ring is at one standard\n+      deviation.\n\
+    +  - id: inherited_position\n+    kind: hard\n+    text: The visual field position shown is the fitted pRF centre
+    of the candidate's centre voxel, from \n+      candidates.csv.\n+  - id: size_in_voxels\n+    kind: hard\n+\
+    \    text: 'The size is given in voxels of the model sheet, not in millimeters: the sheet has no physical scale.'\n\
+    +  - id: simulation_label\n+    kind: hard\n+    text: The sheet and the target are labelled as simulated; the
+    connective field the target was simulated \n+      with is shown only at the end, labelled as such.\n+timeline:\n\
+    +  - id: layout\n+    at_seconds: 0\n+    tolerance_seconds: 0\n+    kind: hard\n+    instruction: The sheet
+    with the first candidate, the target time course with its prediction, the visual \n+      field inset.\n+  -
+    id: fast_grid\n+    at_seconds: 4.2\n+    tolerance_seconds: 0.7\n+    kind: preferred\n+    instruction: 36
+    candidates at about 0.1 s each.\n+  - id: refinement\n+    at_seconds: 9.2\n+    tolerance_seconds: 0.7\n+ \
+    \   kind: preferred\n+    instruction: The heading becomes 'refinement'; the patch moves to the optimum.\n+\
+    \  - id: result\n+    at_seconds: 12.0\n+    tolerance_seconds: 0.7\n+    kind: preferred\n+    instruction:
+    The simulated connective field appears as a dashed ring; hold to the end.\n direction:\n-  tone: null\n-  avoid:
+    []\n-extensions: {}\n+  tone: Plain, precise, unhurried\n+  avoid:\n+    - Titles inside the clip\n+    - A
+    physical scale for the sheet\n+  prefer:\n+    - Colour by role only\n+    - Identical geometry and timing under
+    the light and the dark style\n+extensions:\n+  website:\n+    themes:\n+      - light\n+      - dark\n+    poster:
+    last_frame"
+scientific_review_required: true
+validation_warnings: []

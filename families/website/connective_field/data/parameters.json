@@ -1,0 +1,22 @@
+{
+  "engine": "prfmodel 0.2.0: Gaussian2DPRFModel for the sources, GaussianCFModel for the target and the fit",
+  "true_center_index": 463,
+  "true_sigma_voxels": 2.0,
+  "true_center_prf": {
+    "x_deg": 2.561,
+    "y_deg": 1.783,
+    "eccentricity_deg": 3.121,
+    "polar_angle_deg": 34.8
+  },
+  "noise_sd_fraction_of_signal_sd": 0.45,
+  "seed": 20261113,
+  "sheet_step": 0.085,
+  "grid": {
+    "centres": 75,
+    "sizes_voxels": [
+      1.0,
+      2.0,
+      4.0
+    ]
+  }
+}

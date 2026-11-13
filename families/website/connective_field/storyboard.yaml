@@ -1,0 +1,112 @@
+schema_version: '1.0'
+project_id: connective_field
+based_on_animation_revision: working
+scenes:
+  - id: fit
+    start_seconds: 0
+    end_seconds: 15
+    purpose: A patch on V1 tries positions and sizes until its weighted sum follows the target voxel; the 
+      target inherits the patch's place in the visual field.
+    patterns: []
+    objects:
+      - id: views
+        kind: custom
+        style_role: primary_signal
+        data:
+          source: controls
+          encoding:
+            x: step
+            y: result
+          transforms:
+            - op: scale
+              column: step
+              by:
+                parameter: step
+                default: 0
+            - op: scale
+              column: refine
+              by:
+                parameter: refine
+                default: 0
+            - op: scale
+              column: result
+              by:
+                parameter: result
+                default: 0
+        params:
+          builder: cf_fit:build
+          arguments: {}
+    actions:
+      - id: candidate_1
+        kind: vary_parameter
+        target: views
+        parameter: step
+        to: 1
+        at_seconds: 1.4
+        duration_seconds: 0.9
+        show_value: false
+      - id: candidate_2
+        kind: vary_parameter
+        target: views
+        parameter: step
+        to: 2
+        at_seconds: 2.8
+        duration_seconds: 0.9
+        show_value: false
+      - id: fast_grid
+        kind: vary_parameter
+        target: views
+        parameter: step
+        to: 38
+        at_seconds: 4.2
+        duration_seconds: 3.6
+        show_value: false
+        easing: linear
+      - id: grid_best
+        kind: vary_parameter
+        target: views
+        parameter: step
+        to: 39
+        at_seconds: 7.9
+        duration_seconds: 0.8
+        show_value: false
+      - id: to_refinement
+        kind: vary_parameter
+        target: views
+        parameter: refine
+        to: 1
+        at_seconds: 9.2
+        duration_seconds: 0.5
+        show_value: false
+      - id: refine_steps
+        kind: vary_parameter
+        target: views
+        parameter: step
+        to: 41
+        at_seconds: 9.8
+        duration_seconds: 1.8
+        show_value: false
+      - id: show_simulated
+        kind: vary_parameter
+        target: views
+        parameter: result
+        to: 1
+        at_seconds: 12.2
+        duration_seconds: 0.5
+        show_value: false
+    snapshots:
+      - id: first_candidate
+        at_seconds: 1.2
+        description: "Candidate 0: a large patch low on the sheet, R squared 0.00, a prediction that does not follow
+          the target; heading 'grid search'."
+      - id: fast_grid
+        at_seconds: 6.0
+        description: 'In the fast phase: the patch somewhere on the sheet, the best so far as a thin dashed ring.'
+      - id: grid_best
+        at_seconds: 8.9
+        description: "The best grid point: size 2.0 voxels, R squared 0.81; the prediction follows the target's
+          peaks."
+      - id: result
+        at_seconds: 14.0
+        description: 'After refinement: size 1.7 voxels, R squared 0.83, eccentricity 3.1 deg, polar angle +35 deg;
+          the simulated connective field (2.0 voxels) as a dashed ring around the same centre, with its label.'

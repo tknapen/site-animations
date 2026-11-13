@@ -1,0 +1,156 @@
+schema_version: '1.0'
+proposal:
+  schema_version: '1.0'
+  id: prop_create_spec
+  kind: create_spec
+  created_at: '2026-11-13T13:00:00+00:00'
+  author: agent:claude
+  summary: 'Specification: a bar sweep over a DN pRF with both pools drawn, traces from a prfmodel simulation, 12
+    s at 2:1.'
+  rationale: The author asked for the DN clips in the form of his reference clips, with both pools drawn on 
+    the pRF and prfmodel as the simulation engine (references/brief.md).
+  based_on_revision: working
+  in_response_to: []
+  uncertainties:
+    - "Parameter values are illustrative, not fitted: pRF centre (1.5, 1.0) deg, sigma_1 = 1 deg, sigma_2 = 4 deg,
+      a = 0.6, b = 0.05, c = 1, d = 0.25, aperture radius 8 deg. They were inferred from the author's two reference
+      clips (dn-sweep.mp4, dn-disc.mp4), except the pRF centre, which was moved so the largest disc stays inside
+      the aperture."
+    - prfmodel's stimulus encoder sums pRF times design over the grid without the cell area; the simulation 
+      multiplies the design (each cell's fraction inside the stimulus) by the cell area so that G.S is the 
+      integral of a volume-normalized Gaussian over the stimulus. The author should confirm this is the 
+      intended convention.
+    - manim8's storyboard contract lets vary_parameter drive a custom object only through a data binding whose
+      transforms name parameters. The object therefore binds a table of unit values (data/controls.csv) and 
+      scales each column by its parameter. This is a workaround for the missing `parameters` field on 
+      `custom`, not a use of data.
+    - The bar is 2 deg wide and vertical, and moves in one direction only; the response is the model's neural 
+      prediction for each bar position, without a haemodynamic response.
+    - The note calls the negative flanks 'surround suppression'. In the simulation the response is below zero 
+      for bar centres from about -7.6 to -1.2 deg and from about 4.3 to 8.4 deg, with a minimum of -0.06 
+      against a peak of 0.85. Whether this is the reading of 'surround suppression' wanted on the page is the 
+      author's call.
+  claims:
+    - statement: The DN pRF model's predicted response is (a G1.S + b)/(c G2.S + d) - b/d, with activation and
+        normalization pRFs as isotropic Gaussians at the same position with sizes sigma_1 and sigma_2.
+      source_id: aqil2021
+      locator: Materials and Methods, 'pRF Models'; Fig. 1D. The same form is implemented in prfmodel 
+        (DivNormPRFModel._combine_responses), which computes the curves.
+      basis: source
+    - statement: With a nonzero activation constant b, a stimulus that covers the normalization pool but not 
+        the activation pool gives a response below zero (surround suppression).
+      source_id: aqil2021
+      locator: Results, 'DN Model Constants Modulate Suppression and Compression'; Fig. 3A
+      basis: source
+    - statement: For the illustrative parameters, the response to the bar peaks at the pRF centre (0.85) and 
+        is negative on both flanks (minimum -0.06).
+      source_id: curves
+      locator: data/bar_sweep.csv
+      basis: source
+  targets:
+    - file: animation.yaml
+      document:
+        schema_version: '1.0'
+        id: dn_bar_sweep
+        title: 'Divisive normalization: a bar crosses the pRF'
+        sources:
+          - id: aqil2021
+            type: markdown
+            path: references/aqil2021.md
+            role: scientific_reference
+            citation: Aqil M, Knapen T, Dumoulin SO (2021). Divisive normalization unifies disparate response 
+              signatures throughout the human visual hierarchy. PNAS 118(46), e2108713118. 
+              doi:10.1073/pnas.2108713118
+          - id: curves
+            type: csv
+            path: data/bar_sweep.csv
+            role: illustrative_data
+            citation: Simulated with prfmodel 0.2.0 (DivNormGaussian2DPRFModel) by sim/simulate_dn.py; 
+              illustrative parameters.
+          - id: controls
+            type: csv
+            path: data/controls.csv
+            role: illustrative_data
+            citation: "Unit values, one column per animated quantity; the object's data binding scales each by the
+              parameter that a vary_parameter action drives. Not data: it is how a custom object declares its parameters."
+          - id: simulation
+            type: markdown
+            path: references/simulation.md
+            role: explanatory_text
+        output:
+          duration_seconds: 12
+          width_px: 1920
+          height_px: 960
+          aspect_ratio: 2:1
+          fps: 30
+          container: mp4
+          video_codec: h264
+          audio: none
+        style:
+          name: knapen_site
+          version: 0.1.0
+          overrides: {}
+        equations:
+          - id: dn_model
+            typst: r = (a thin G_1 dot.op S + b) / (c thin G_2 dot.op S + d) - b / d
+            latex: r = \frac{a\,G_1 \cdot S + b}{c\,G_2 \cdot S + d} - \frac{b}{d}
+            symbols:
+              r:
+                meaning: predicted neural response
+              S:
+                meaning: the stimulus
+              G_1:
+                meaning: activation pRF, a volume-normalized Gaussian of size sigma_1
+              G_2:
+                meaning: normalization pRF, a volume-normalized Gaussian of size sigma_2 at the same position
+              a:
+                meaning: activation amplitude
+              b:
+                meaning: activation constant
+              c:
+                meaning: normalization amplitude
+              d:
+                meaning: normalization constant
+        audience: graduate_neuroscience
+        objective: 'Show the two pools of the divisive normalization pRF model at work: as a bar crosses the visual
+          field, the activation pool (numerator) responds only near the pRF, the larger normalization pool (denominator)
+          over a wider range, and their ratio (the response) peaks at the pRF and dips below zero on its flanks.'
+        scientific_constraints:
+          - id: pools_drawn
+            kind: hard
+            text: 'Draw both pools on the pRF: a solid circle at sigma_1 (activation) and a dashed circle at sigma_2
+              (normalization).'
+          - id: traces_from_simulation
+            kind: hard
+            equation: dn_model
+            text: Numerator, denominator and response are the prfmodel simulation, drawn up to the bar's 
+              current position; nothing is redrawn by hand.
+          - id: simulation_label
+            kind: hard
+            text: Label the curves as a simulation with illustrative parameters, not as data.
+          - id: fixed_axes
+            kind: hard
+            text: Keep both axes fixed.
+        timeline:
+          - id: sweep
+            at_seconds: 0
+            tolerance_seconds: 0
+            kind: hard
+            instruction: The field, the plot and the equation; the bar starts outside the field on the left.
+        direction:
+          tone: Minimal, precise, scientific
+          avoid:
+            - Decorative flourishes
+            - Unlabeled axes
+            - Title cards
+        extensions: {}
+  touches_science: true
+applied_at: '2026-11-13T11:53:29+00:00'
+applied_to_revision: working
+diffs:
+  animation.yaml: "--- a/animation.yaml\n+++ b/animation.yaml\n@@ -82,7 +82,7 @@\n     at_seconds: 0\n     tolerance_seconds:
+    0\n     kind: hard\n-    instruction: The field, the plot and the equation; the bar starts at the left edge.\n\
+    +    instruction: The field, the plot and the equation; the bar starts outside the field on the left.\n direction:\n\
+    \   tone: Minimal, precise, scientific\n   avoid:"
+scientific_review_required: true
+validation_warnings: []

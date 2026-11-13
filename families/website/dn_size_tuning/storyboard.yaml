@@ -1,0 +1,186 @@
+schema_version: '1.0'
+project_id: dn_size_tuning
+based_on_animation_revision: working
+scenes:
+  - id: growth
+    start_seconds: 0
+    end_seconds: 24
+    purpose: A disc grows over the pRF; the response peaks and falls; d and the size ratio change how much it 
+      falls.
+    patterns: []
+    objects:
+      - id: caption
+        kind: text_caption
+        style_role: foreground
+        params:
+          text: A disc grows over the pRF
+          role: body
+          anchor: top_left
+      - id: note_peak
+        kind: text_caption
+        style_role: secondary_text
+        params:
+          text: 'past the peak the response falls: oversaturation'
+          role: caption
+          below: caption
+        reveal_at_seconds: 4.0
+      - id: note_d
+        kind: text_caption
+        style_role: secondary_text
+        params:
+          text: 'a larger d: a weaker response, less oversaturation'
+          role: caption
+          below: caption
+        reveal_at_seconds: 9.8
+      - id: note_ratio
+        kind: text_caption
+        style_role: secondary_text
+        params:
+          text: as σ₂ shrinks toward σ₁, the oversaturation vanishes
+          role: caption
+          below: caption
+        reveal_at_seconds: 16.4
+      - id: views
+        kind: custom
+        style_role: primary_signal
+        data:
+          source: controls
+          encoding:
+            x: position
+            y: annotate
+          transforms:
+            - op: scale
+              column: position
+              by:
+                parameter: position
+                default: 0
+            - op: scale
+              column: d
+              by:
+                parameter: d
+                default: 0.25
+            - op: scale
+              column: ratio
+              by:
+                parameter: ratio
+                default: 4
+            - op: scale
+              column: annotate
+              by:
+                parameter: annotate
+                default: 0
+        params:
+          builder: dn_views:build
+          arguments:
+            mode: disc
+            table: data/disc_growth.csv
+            parameters: data/parameters.json
+            x_label: disc radius (deg)
+            y_label: model output (a.u.)
+            x_range:
+              - 0
+              - 6
+              - 1
+            y_range:
+              - 0
+              - 2
+              - 0.5
+            height_fraction: 0.83
+            data_label: simulated with prfmodel, illustrative parameters
+      - id: model_equation
+        kind: equation_block
+        style_role: foreground
+        equation:
+          id: dn_model
+          highlight:
+            - d
+        params:
+          anchor: top_right
+          scale: 0.78
+    actions:
+      - id: grow
+        kind: vary_parameter
+        target: views
+        parameter: position
+        to: 6
+        at_seconds: 1.2
+        duration_seconds: 6.0
+        show_value: false
+        easing: eased_linear
+      - id: mark
+        kind: vary_parameter
+        target: views
+        parameter: annotate
+        to: 1
+        at_seconds: 7.7
+        duration_seconds: 0.6
+        show_value: false
+      - id: hide_note_peak
+        kind: fade_object
+        target: note_peak
+        visible: false
+        at_seconds: 9.0
+        duration_seconds: 0.5
+      - id: raise_d
+        kind: vary_parameter
+        target: views
+        parameter: d
+        to: 1.0
+        at_seconds: 9.8
+        duration_seconds: 2.5
+        show_value: false
+        lead_in_seconds: 0.9
+        emphasize:
+          - model_equation
+      - id: lower_d
+        kind: vary_parameter
+        target: views
+        parameter: d
+        to: 0.25
+        at_seconds: 13.8
+        duration_seconds: 1.6
+        show_value: false
+      - id: hide_note_d
+        kind: fade_object
+        target: note_d
+        visible: false
+        at_seconds: 15.6
+        duration_seconds: 0.5
+      - id: shrink_pool
+        kind: vary_parameter
+        target: views
+        parameter: ratio
+        to: 1.0
+        at_seconds: 16.4
+        duration_seconds: 3.0
+        show_value: false
+      - id: grow_pool
+        kind: vary_parameter
+        target: views
+        parameter: ratio
+        to: 4.0
+        at_seconds: 20.6
+        duration_seconds: 2.4
+        show_value: false
+    snapshots:
+      - id: start
+        at_seconds: 1.0
+        description: The field with the pRF wash, the solid sigma_1 circle and the dashed sigma_2 circle four 
+          times larger; empty axes with the legend; readouts d = 0.25 and sigma_2/sigma_1 = 4.0 under the 
+          field.
+      - id: grown
+        at_seconds: 8.6
+        description: The disc at 6 deg; the response peaks near 2 deg and falls; a marker on the peak and the 
+          annotation of the drop by 6 deg; the first note.
+      - id: d_high
+        at_seconds: 13.5
+        description: d = 1.00 in the emphasis ink; the denominator is shifted up, the response is lower and 
+          flatter than the grey reference curve; the second note.
+      - id: ratio_one
+        at_seconds: 19.9
+        description: 'sigma_2/sigma_1 = 1.0: the dashed circle coincides with the solid one; the response rises
+          to a plateau and the annotation reports no drop; the third note.'
+      - id: end
+        at_seconds: 23.5
+        description: 'Back at the reference values: the dashed circle four times the solid one, the response peaked
+          with the drop annotation.'

@@ -1,0 +1,92 @@
+schema_version: '1.0'
+id: dn_bar_sweep
+title: 'Divisive normalization: a bar crosses the pRF'
+sources:
+  - id: aqil2021
+    type: markdown
+    path: references/aqil2021.md
+    role: scientific_reference
+    citation: Aqil M, Knapen T, Dumoulin SO (2021). Divisive normalization unifies disparate response 
+      signatures throughout the human visual hierarchy. PNAS 118(46), e2108713118. doi:10.1073/pnas.2108713118
+  - id: curves
+    type: csv
+    path: data/bar_sweep.csv
+    role: illustrative_data
+    citation: Simulated with prfmodel 0.2.0 (DivNormGaussian2DPRFModel) by sim/simulate_dn.py; illustrative 
+      parameters.
+  - id: controls
+    type: csv
+    path: data/controls.csv
+    role: illustrative_data
+    citation: "Unit values, one column per animated quantity; the object's data binding scales each by the parameter
+      that a vary_parameter action drives. Not data: it is how a custom object declares its parameters."
+  - id: simulation
+    type: markdown
+    path: references/simulation.md
+    role: explanatory_text
+output:
+  duration_seconds: 12
+  width_px: 1920
+  height_px: 960
+  aspect_ratio: 2:1
+  fps: 30
+  container: mp4
+  video_codec: h264
+  audio: none
+style:
+  name: knapen_site
+  version: 0.1.0
+  overrides: {}
+equations:
+  - id: dn_model
+    typst: r = (a thin G_1 dot.op S + b) / (c thin G_2 dot.op S + d) - b / d
+    latex: r = \frac{a\,G_1 \cdot S + b}{c\,G_2 \cdot S + d} - \frac{b}{d}
+    symbols:
+      r:
+        meaning: predicted neural response
+      S:
+        meaning: the stimulus
+      G_1:
+        meaning: activation pRF, a volume-normalized Gaussian of size sigma_1
+      G_2:
+        meaning: normalization pRF, a volume-normalized Gaussian of size sigma_2 at the same position
+      a:
+        meaning: activation amplitude
+      b:
+        meaning: activation constant
+      c:
+        meaning: normalization amplitude
+      d:
+        meaning: normalization constant
+audience: graduate_neuroscience
+objective: 'Show the two pools of the divisive normalization pRF model at work: as a bar crosses the visual field,
+  the activation pool (numerator) responds only near the pRF, the larger normalization pool (denominator) over a
+  wider range, and their ratio (the response) peaks at the pRF and dips below zero on its flanks.'
+scientific_constraints:
+  - id: pools_drawn
+    kind: hard
+    text: 'Draw both pools on the pRF: a solid circle at sigma_1 (activation) and a dashed circle at sigma_2 (normalization).'
+  - id: traces_from_simulation
+    kind: hard
+    equation: dn_model
+    text: Numerator, denominator and response are the prfmodel simulation, drawn up to the bar's current 
+      position; nothing is redrawn by hand.
+  - id: simulation_label
+    kind: hard
+    text: Label the curves as a simulation with illustrative parameters, not as data.
+  - id: fixed_axes
+    kind: hard
+    text: Keep both axes fixed.
+timeline:
+  - id: sweep
+    at_seconds: 0
+    tolerance_seconds: 0
+    kind: hard
+    instruction: The field, the plot and the equation; the bar starts outside the field on the left.
+direction:
+  tone: Minimal, precise, scientific
+  avoid:
+    - Decorative flourishes
+    - Unlabeled axes
+    - Title cards
+extensions: {}

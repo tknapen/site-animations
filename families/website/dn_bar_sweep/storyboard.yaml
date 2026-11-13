@@ -1,0 +1,93 @@
+schema_version: '1.0'
+project_id: dn_bar_sweep
+based_on_animation_revision: working
+scenes:
+  - id: sweep
+    start_seconds: 0
+    end_seconds: 12
+    purpose: A bar crosses the field; the activation pool, the normalization pool and their ratio respond.
+    patterns: []
+    objects:
+      - id: caption
+        kind: text_caption
+        style_role: foreground
+        params:
+          text: A bar crosses the pRF
+          role: body
+          anchor: top_left
+      - id: note
+        kind: text_caption
+        style_role: secondary_text
+        params:
+          text: 'beside the pRF the response dips below zero: surround suppression'
+          role: caption
+          below: caption
+        reveal_at_seconds: 4.0
+      - id: views
+        kind: custom
+        style_role: primary_signal
+        data:
+          source: controls
+          encoding:
+            x: position
+            y: shown
+          transforms:
+            - op: scale
+              column: position
+              by:
+                parameter: position
+                default: -9
+            - op: scale
+              column: shown
+              by:
+                parameter: shown
+                default: 1
+        params:
+          builder: dn_views:build
+          arguments:
+            mode: bar
+            table: data/bar_sweep.csv
+            parameters: data/parameters.json
+            x_label: bar centre (deg)
+            y_label: model output (a.u.)
+            x_range:
+              - -8
+              - 8
+              - 4
+            y_range:
+              - -0.2
+              - 1.0
+              - 0.2
+            height_fraction: 0.83
+            data_label: simulated with prfmodel, illustrative parameters
+      - id: model_equation
+        kind: equation_block
+        style_role: foreground
+        equation:
+          id: dn_model
+        params:
+          anchor: top_right
+          scale: 0.78
+    actions:
+      - id: cross
+        kind: vary_parameter
+        target: views
+        parameter: position
+        to: 9
+        at_seconds: 1.2
+        duration_seconds: 8.4
+        show_value: false
+        easing: eased_linear
+    snapshots:
+      - id: start
+        at_seconds: 1.0
+        description: The field with fixation, the pRF wash, the solid sigma_1 circle and the dashed sigma_2 
+          circle; the bar still outside the field; empty axes with the legend; the equation at the top right.
+      - id: on_prf
+        at_seconds: 6.1
+        description: The bar over the pRF centre; the response trace at its peak, above the numerator and the 
+          denominator.
+      - id: end
+        at_seconds: 11.0
+        description: The bar has left the field; all three traces complete, the response peaked at the pRF 
+          with shallow negative flanks; the note is shown.

@@ -1,0 +1,109 @@
+schema_version: '1.0'
+id: dn_size_tuning
+title: 'Divisive normalization: size tuning and oversaturation'
+sources:
+  - id: aqil2021
+    type: markdown
+    path: references/aqil2021.md
+    role: scientific_reference
+    citation: Aqil M, Knapen T, Dumoulin SO (2021). Divisive normalization unifies disparate response 
+      signatures throughout the human visual hierarchy. PNAS 118(46), e2108713118. doi:10.1073/pnas.2108713118
+  - id: curves
+    type: csv
+    path: data/disc_growth.csv
+    role: illustrative_data
+    citation: Simulated with prfmodel 0.2.0 (DivNormGaussian2DPRFModel) by sim/simulate_dn.py; illustrative 
+      parameters.
+  - id: controls
+    type: csv
+    path: data/controls.csv
+    role: illustrative_data
+    citation: "Unit values, one column per animated quantity; the object's data binding scales each by the parameter
+      that a vary_parameter action drives. Not data: it is how a custom object declares its parameters."
+  - id: simulation
+    type: markdown
+    path: references/simulation.md
+    role: explanatory_text
+output:
+  duration_seconds: 24
+  width_px: 1920
+  height_px: 960
+  aspect_ratio: 2:1
+  fps: 30
+  container: mp4
+  video_codec: h264
+  audio: none
+style:
+  name: knapen_site
+  version: 0.1.0
+  overrides: {}
+equations:
+  - id: dn_model
+    typst: r = (a thin G_1 dot.op S + b) / (c thin G_2 dot.op S + d) - b / d
+    latex: r = \frac{a\,G_1 \cdot S + b}{c\,G_2 \cdot S + d} - \frac{b}{d}
+    symbols:
+      r:
+        meaning: predicted neural response
+      S:
+        meaning: the stimulus
+      G_1:
+        meaning: activation pRF, a volume-normalized Gaussian of size sigma_1
+      G_2:
+        meaning: normalization pRF, a volume-normalized Gaussian of size sigma_2 at the same position
+      a:
+        meaning: activation amplitude
+      b:
+        meaning: activation constant
+      c:
+        meaning: normalization amplitude
+      d:
+        meaning: normalization constant
+audience: graduate_neuroscience
+objective: 'Show spatial oversaturation in the divisive normalization pRF model and what it depends on: as a disc
+  grows around the pRF centre, the response peaks and then falls as the disc fills the normalization pool; a larger
+  normalization constant d weakens the response and its falloff, and the falloff vanishes as the normalization pool
+  shrinks to the size of the activation pool.'
+scientific_constraints:
+  - id: pools_drawn
+    kind: hard
+    text: 'Draw both pools on the pRF: a solid circle at sigma_1 (activation) and a dashed circle at sigma_2 (normalization);
+      the dashed circle follows the size ratio.'
+  - id: traces_from_simulation
+    kind: hard
+    equation: dn_model
+    text: Numerator, denominator and response are the prfmodel simulation; between simulated values of d and 
+      of the size ratio the curves are interpolated linearly.
+  - id: one_parameter_at_a_time
+    kind: hard
+    equation: dn_model
+    text: d and the size ratio vary one at a time, each returning to its reference value before the other 
+      moves.
+  - id: simulation_label
+    kind: hard
+    text: Label the curves as a simulation with illustrative parameters, not as data.
+  - id: fixed_axes
+    kind: hard
+    text: Keep both axes fixed while a parameter varies.
+timeline:
+  - id: growth
+    at_seconds: 0
+    tolerance_seconds: 0
+    kind: hard
+    instruction: The disc grows from 0 to 6 deg and the traces are drawn.
+  - id: d
+    at_seconds: 9.8
+    tolerance_seconds: 1
+    kind: preferred
+    instruction: d rises from 0.25 to 1 and returns.
+  - id: ratio
+    at_seconds: 16.4
+    tolerance_seconds: 1
+    kind: preferred
+    instruction: The size ratio falls from 4 to 1 and returns.
+direction:
+  tone: Minimal, precise, scientific
+  avoid:
+    - Decorative flourishes
+    - Unlabeled axes
+    - Title cards
+extensions: {}

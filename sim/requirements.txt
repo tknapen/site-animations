@@ -1,0 +1,2 @@
+# The simulation engine for the clips' curves: prfmodel on the JAX backend of Keras.
+prfmodel[jax]==0.2.0

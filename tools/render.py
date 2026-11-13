@@ -42,9 +42,11 @@ def run(cmd, **kw):
     return subprocess.run(cmd, check=True, **kw)
 
 
-def render(project, style, profile, env):
+def render(project, style, profile, env, fresh=False):
     """Returns the manifest of the job (manim8 prints it alone on stdout with --json)."""
     cmd = ["manim8", "render", str(project), "--profile", profile, "--style", style, "--json"]
+    if fresh:
+        cmd.append("--no-cache")
     done = subprocess.run(cmd, env=env, capture_output=True, text=True)
     if done.returncode != 0:
         sys.stderr.write(done.stderr[-3000:])
@@ -78,6 +80,7 @@ def main():
     ap.add_argument("--profile", default="draft", choices=["storyboard", "draft", "final"])
     ap.add_argument("--site", type=Path, help="checkout of tknapen.github.io to copy the clips into")
     ap.add_argument("--light-only", action="store_true", help="skip the dark render")
+    ap.add_argument("--no-cache", action="store_true", help="render even when manim8 has a cached result")
     args = ap.parse_args()
 
     env = dict(os.environ, FONTCONFIG_FILE=str(ROOT / "fonts" / "fonts.conf"))
@@ -90,11 +93,14 @@ def main():
         clip_id = project.name.replace("_", "-")
         print(f"{clip_id}")
         run(["manim8", "codegen", str(project)], env=env, capture_output=True)
+        # manim8's cache key does not cover a custom builder's code or the files it reads, so a clip that
+        # uses one is always rendered afresh.
+        fresh = args.no_cache or "kind: custom" in (project / "storyboard.yaml").read_text()
         for mode, style in STYLES.items():
             if mode == "dark" and args.light_only:
                 continue
             style_ref = f"{style}@{newest_version(style)}"
-            manifest = render(project, style_ref, args.profile, env)
+            manifest = render(project, style_ref, args.profile, env, fresh)
             video = project / manifest["result"]["videos"][0]["path"]
             dst = (out / "dark" if mode == "dark" else out) / f"{clip_id}.mp4"
             info = encode(video, dst)

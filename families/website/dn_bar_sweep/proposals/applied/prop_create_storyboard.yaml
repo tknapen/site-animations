@@ -1,0 +1,181 @@
+schema_version: '1.0'
+proposal:
+  schema_version: '1.0'
+  id: prop_create_storyboard
+  kind: create_storyboard
+  created_at: '2026-11-13T13:00:00+00:00'
+  author: agent:claude
+  summary: 'Storyboard: one scene; the bar crosses the field in 8.4 s at constant speed while numerator, denominator
+    and response are traced.'
+  rationale: The author asked for the DN clips in the form of his reference clips, with both pools drawn on 
+    the pRF and prfmodel as the simulation engine (references/brief.md).
+  based_on_revision: working
+  in_response_to: []
+  uncertainties:
+    - "Parameter values are illustrative, not fitted: pRF centre (1.5, 1.0) deg, sigma_1 = 1 deg, sigma_2 = 4 deg,
+      a = 0.6, b = 0.05, c = 1, d = 0.25, aperture radius 8 deg. They were inferred from the author's two reference
+      clips (dn-sweep.mp4, dn-disc.mp4), except the pRF centre, which was moved so the largest disc stays inside
+      the aperture."
+    - prfmodel's stimulus encoder sums pRF times design over the grid without the cell area; the simulation 
+      multiplies the design (each cell's fraction inside the stimulus) by the cell area so that G.S is the 
+      integral of a volume-normalized Gaussian over the stimulus. The author should confirm this is the 
+      intended convention.
+    - manim8's storyboard contract lets vary_parameter drive a custom object only through a data binding whose
+      transforms name parameters. The object therefore binds a table of unit values (data/controls.csv) and 
+      scales each column by its parameter. This is a workaround for the missing `parameters` field on 
+      `custom`, not a use of data.
+    - The bar is 2 deg wide and vertical, and moves in one direction only; the response is the model's neural 
+      prediction for each bar position, without a haemodynamic response.
+    - The note calls the negative flanks 'surround suppression'. In the simulation the response is below zero 
+      for bar centres from about -7.6 to -1.2 deg and from about 4.3 to 8.4 deg, with a minimum of -0.06 
+      against a peak of 0.85. Whether this is the reading of 'surround suppression' wanted on the page is the 
+      author's call.
+  claims:
+    - statement: The DN pRF model's predicted response is (a G1.S + b)/(c G2.S + d) - b/d, with activation and
+        normalization pRFs as isotropic Gaussians at the same position with sizes sigma_1 and sigma_2.
+      source_id: aqil2021
+      locator: Materials and Methods, 'pRF Models'; Fig. 1D. The same form is implemented in prfmodel 
+        (DivNormPRFModel._combine_responses), which computes the curves.
+      basis: source
+    - statement: With a nonzero activation constant b, a stimulus that covers the normalization pool but not 
+        the activation pool gives a response below zero (surround suppression).
+      source_id: aqil2021
+      locator: Results, 'DN Model Constants Modulate Suppression and Compression'; Fig. 3A
+      basis: source
+    - statement: For the illustrative parameters, the response to the bar peaks at the pRF centre (0.85) and 
+        is negative on both flanks (minimum -0.06).
+      source_id: curves
+      locator: data/bar_sweep.csv
+      basis: source
+  targets:
+    - file: storyboard.yaml
+      document:
+        schema_version: '1.0'
+        project_id: dn_bar_sweep
+        based_on_animation_revision: working
+        scenes:
+          - id: sweep
+            start_seconds: 0
+            end_seconds: 12
+            purpose: A bar crosses the field; the activation pool, the normalization pool and their ratio 
+              respond.
+            patterns: []
+            objects:
+              - id: caption
+                kind: text_caption
+                style_role: foreground
+                params:
+                  text: A bar crosses the pRF
+                  role: body
+                  anchor: top_left
+              - id: note
+                kind: text_caption
+                style_role: secondary_text
+                params:
+                  text: 'beside the pRF the response dips below zero: surround suppression'
+                  role: caption
+                  below: caption
+                reveal_at_seconds: 4.0
+              - id: views
+                kind: custom
+                style_role: primary_signal
+                data:
+                  source: controls
+                  encoding:
+                    x: position
+                    y: shown
+                  transforms:
+                    - op: scale
+                      column: position
+                      by:
+                        parameter: position
+                        default: -9
+                    - op: scale
+                      column: shown
+                      by:
+                        parameter: shown
+                        default: 1
+                params:
+                  builder: dn_views:build
+                  arguments:
+                    mode: bar
+                    table: data/bar_sweep.csv
+                    parameters: data/parameters.json
+                    x_label: bar centre (deg)
+                    y_label: model output (a.u.)
+                    x_range:
+                      - -8
+                      - 8
+                      - 4
+                    y_range:
+                      - -0.2
+                      - 1.0
+                      - 0.2
+                    height_fraction: 0.83
+                    data_label: simulated with prfmodel, illustrative parameters
+              - id: model_equation
+                kind: equation_block
+                style_role: foreground
+                equation:
+                  id: dn_model
+                params:
+                  anchor: top_right
+                  scale: 0.78
+            actions:
+              - id: cross
+                kind: vary_parameter
+                target: views
+                parameter: position
+                to: 9
+                at_seconds: 1.2
+                duration_seconds: 8.4
+                show_value: false
+                easing: eased_linear
+            snapshots:
+              - id: start
+                at_seconds: 1.0
+                description: The field with fixation, the pRF wash, the solid sigma_1 circle and the dashed 
+                  sigma_2 circle; the bar still outside the field; empty axes with the legend; the equation at
+                  the top right.
+              - id: on_prf
+                at_seconds: 6.1
+                description: The bar over the pRF centre; the response trace at its peak, above the numerator 
+                  and the denominator.
+              - id: end
+                at_seconds: 11.0
+                description: The bar has left the field; all three traces complete, the response peaked at the
+                  pRF with shallow negative flanks; the note is shown.
+  touches_science: true
+applied_at: '2026-11-13T11:53:30+00:00'
+applied_to_revision: working
+diffs:
+  storyboard.yaml: "--- a/storyboard.yaml\n+++ b/storyboard.yaml\n@@ -0,0 +1,93 @@\n+schema_version: '1.0'\n+project_id:
+    dn_bar_sweep\n+based_on_animation_revision: working\n+scenes:\n+  - id: sweep\n+    start_seconds: 0\n+    end_seconds:
+    12\n+    purpose: A bar crosses the field; the activation pool, the normalization pool and their ratio respond.\n\
+    +    patterns: []\n+    objects:\n+      - id: caption\n+        kind: text_caption\n+        style_role: foreground\n\
+    +        params:\n+          text: A bar crosses the pRF\n+          role: body\n+          anchor: top_left\n\
+    +      - id: note\n+        kind: text_caption\n+        style_role: secondary_text\n+        params:\n+   \
+    \       text: 'beside the pRF the response dips below zero: surround suppression'\n+          role: caption\n\
+    +          below: caption\n+        reveal_at_seconds: 4.0\n+      - id: views\n+        kind: custom\n+   \
+    \     style_role: primary_signal\n+        data:\n+          source: controls\n+          encoding:\n+     \
+    \       x: position\n+            y: shown\n+          transforms:\n+            - op: scale\n+            \
+    \  column: position\n+              by:\n+                parameter: position\n+                default: -9\n\
+    +            - op: scale\n+              column: shown\n+              by:\n+                parameter: shown\n\
+    +                default: 1\n+        params:\n+          builder: dn_views:build\n+          arguments:\n+\
+    \            mode: bar\n+            table: data/bar_sweep.csv\n+            parameters: data/parameters.json\n\
+    +            x_label: bar centre (deg)\n+            y_label: model output (a.u.)\n+            x_range:\n+\
+    \              - -8\n+              - 8\n+              - 4\n+            y_range:\n+              - -0.2\n\
+    +              - 1.0\n+              - 0.2\n+            height_fraction: 0.83\n+            data_label: simulated
+    with prfmodel, illustrative parameters\n+      - id: model_equation\n+        kind: equation_block\n+      \
+    \  style_role: foreground\n+        equation:\n+          id: dn_model\n+        params:\n+          anchor:
+    top_right\n+          scale: 0.78\n+    actions:\n+      - id: cross\n+        kind: vary_parameter\n+     \
+    \   target: views\n+        parameter: position\n+        to: 9\n+        at_seconds: 1.2\n+        duration_seconds:
+    8.4\n+        show_value: false\n+        easing: eased_linear\n+    snapshots:\n+      - id: start\n+     \
+    \   at_seconds: 1.0\n+        description: The field with fixation, the pRF wash, the solid sigma_1 circle and
+    the dashed sigma_2 \n+          circle; the bar still outside the field; empty axes with the legend; the equation
+    at the top right.\n+      - id: on_prf\n+        at_seconds: 6.1\n+        description: The bar over the pRF
+    centre; the response trace at its peak, above the numerator and the \n+          denominator.\n+      - id:
+    end\n+        at_seconds: 11.0\n+        description: The bar has left the field; all three traces complete,
+    the response peaked at the pRF \n+          with shallow negative flanks; the note is shown."
+scientific_review_required: true
+validation_warnings: []

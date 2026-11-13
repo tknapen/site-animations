@@ -1,0 +1,12 @@
+{
+  "mu_x": 1.5,
+  "mu_y": 1.0,
+  "sigma_activation": 1.0,
+  "sigma_normalization": 4.0,
+  "amplitude_activation": 0.6,
+  "baseline_activation": 0.05,
+  "amplitude_normalization": 1.0,
+  "baseline_normalization": 0.25,
+  "aperture_radius": 8.0,
+  "engine": "prfmodel 0.2.0, DivNormGaussian2DPRFModel"
+}

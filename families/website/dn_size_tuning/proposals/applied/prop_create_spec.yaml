@@ -1,0 +1,186 @@
+schema_version: '1.0'
+proposal:
+  schema_version: '1.0'
+  id: prop_create_spec
+  kind: create_spec
+  created_at: '2026-11-13T13:00:00+00:00'
+  author: agent:claude
+  summary: 'Specification: a growing disc over a DN pRF with both pools drawn; oversaturation and its dependence
+    on d and the size ratio; 24 s at 2:1.'
+  rationale: The author asked for the DN clips in the form of his reference clips, with both pools drawn on 
+    the pRF and prfmodel as the simulation engine (references/brief.md).
+  based_on_revision: working
+  in_response_to: []
+  uncertainties:
+    - "Parameter values are illustrative, not fitted: pRF centre (1.5, 1.0) deg, sigma_1 = 1 deg, sigma_2 = 4 deg,
+      a = 0.6, b = 0.05, c = 1, d = 0.25, aperture radius 8 deg. They were inferred from the author's two reference
+      clips (dn-sweep.mp4, dn-disc.mp4), except the pRF centre, which was moved so the largest disc stays inside
+      the aperture."
+    - prfmodel's stimulus encoder sums pRF times design over the grid without the cell area; the simulation 
+      multiplies the design (each cell's fraction inside the stimulus) by the cell area so that G.S is the 
+      integral of a volume-normalized Gaussian over the stimulus. The author should confirm this is the 
+      intended convention.
+    - manim8's storyboard contract lets vary_parameter drive a custom object only through a data binding whose
+      transforms name parameters. The object therefore binds a table of unit values (data/controls.csv) and 
+      scales each column by its parameter. This is a workaround for the missing `parameters` field on 
+      `custom`, not a use of data.
+    - The plot shows the model output in its own units, not a normalized size-response curve, so changing d or
+      the ratio also changes the overall amplitude (peak 1.35 at d = 0.25, 0.48 at d = 1; 0.32 at ratio 1). 
+      The paper's Fig. 3 may normalize the curves; the author should say which reading is wanted.
+    - The size ratio is varied by changing sigma_2 with sigma_1 fixed at 1 deg. With volume-normalized 
+      Gaussians a smaller sigma_2 concentrates the normalization pool, so the denominator rises faster and the
+      response becomes smaller overall.
+    - The drop annotation is the change from the peak to the 6 deg disc. It is -63% at the reference values, 
+      -30% at d = 1 and zero at ratio 1, but it is not monotonic in the ratio between 4 and 3 (-63% and -65%),
+      because at ratio 4 the 6 deg disc does not yet fill the normalization pool.
+    - The paper describes d as controlling the first nonlinearity of the size-response curve (compression) and
+      the size ratio as controlling oversaturation. In this simulation d also changes the relative falloff; 
+      the second note says so as an observation of the simulation, which the author should check against the 
+      intended message.
+  claims:
+    - statement: The DN pRF model's predicted response is (a G1.S + b)/(c G2.S + d) - b/d, with activation and
+        normalization pRFs as isotropic Gaussians at the same position with sizes sigma_1 and sigma_2.
+      source_id: aqil2021
+      locator: Materials and Methods, 'pRF Models'; Fig. 1D. The same form is implemented in prfmodel 
+        (DivNormPRFModel._combine_responses), which computes the curves.
+      basis: source
+    - statement: 'The size ratio sigma_2/sigma_1 controls spatial oversaturation of the size-response curve: at
+        ratio 1 the response reaches a plateau, and above 1 it falls for large stimuli.'
+      source_id: aqil2021
+      locator: Results, 'DN Model Constants Modulate Suppression and Compression'; Fig. 3
+      basis: source
+    - statement: The size-response curve is the response to a circular stimulus of growing radius centred on 
+        the pRF.
+      source_id: aqil2021
+      locator: Materials and Methods, 'PRF Profiles and Response Function'
+      basis: source
+    - statement: For the illustrative parameters the response to the disc peaks at 1.95 deg (1.35) and is 63% 
+        lower at 6 deg; at d = 1 the peak is 0.48 at 2.5 deg and the drop 30%; at ratio 1 the response rises 
+        to a plateau of 0.32 without falling.
+      source_id: curves
+      locator: data/disc_growth.csv
+      basis: source
+    - statement: A larger d gives a weaker response with less relative falloff, for these parameter values.
+      source_id: curves
+      locator: data/disc_growth.csv, sweep d
+      basis: inference
+  targets:
+    - file: animation.yaml
+      document:
+        schema_version: '1.0'
+        id: dn_size_tuning
+        title: 'Divisive normalization: size tuning and oversaturation'
+        sources:
+          - id: aqil2021
+            type: markdown
+            path: references/aqil2021.md
+            role: scientific_reference
+            citation: Aqil M, Knapen T, Dumoulin SO (2021). Divisive normalization unifies disparate response 
+              signatures throughout the human visual hierarchy. PNAS 118(46), e2108713118. 
+              doi:10.1073/pnas.2108713118
+          - id: curves
+            type: csv
+            path: data/disc_growth.csv
+            role: illustrative_data
+            citation: Simulated with prfmodel 0.2.0 (DivNormGaussian2DPRFModel) by sim/simulate_dn.py; 
+              illustrative parameters.
+          - id: controls
+            type: csv
+            path: data/controls.csv
+            role: illustrative_data
+            citation: "Unit values, one column per animated quantity; the object's data binding scales each by the
+              parameter that a vary_parameter action drives. Not data: it is how a custom object declares its parameters."
+          - id: simulation
+            type: markdown
+            path: references/simulation.md
+            role: explanatory_text
+        output:
+          duration_seconds: 24
+          width_px: 1920
+          height_px: 960
+          aspect_ratio: 2:1
+          fps: 30
+          container: mp4
+          video_codec: h264
+          audio: none
+        style:
+          name: knapen_site
+          version: 0.1.0
+          overrides: {}
+        equations:
+          - id: dn_model
+            typst: r = (a thin G_1 dot.op S + b) / (c thin G_2 dot.op S + d) - b / d
+            latex: r = \frac{a\,G_1 \cdot S + b}{c\,G_2 \cdot S + d} - \frac{b}{d}
+            symbols:
+              r:
+                meaning: predicted neural response
+              S:
+                meaning: the stimulus
+              G_1:
+                meaning: activation pRF, a volume-normalized Gaussian of size sigma_1
+              G_2:
+                meaning: normalization pRF, a volume-normalized Gaussian of size sigma_2 at the same position
+              a:
+                meaning: activation amplitude
+              b:
+                meaning: activation constant
+              c:
+                meaning: normalization amplitude
+              d:
+                meaning: normalization constant
+        audience: graduate_neuroscience
+        objective: 'Show spatial oversaturation in the divisive normalization pRF model and what it depends on:
+          as a disc grows around the pRF centre, the response peaks and then falls as the disc fills the normalization
+          pool; a larger normalization constant d weakens the response and its falloff, and the falloff vanishes
+          as the normalization pool shrinks to the size of the activation pool.'
+        scientific_constraints:
+          - id: pools_drawn
+            kind: hard
+            text: 'Draw both pools on the pRF: a solid circle at sigma_1 (activation) and a dashed circle at sigma_2
+              (normalization); the dashed circle follows the size ratio.'
+          - id: traces_from_simulation
+            kind: hard
+            equation: dn_model
+            text: Numerator, denominator and response are the prfmodel simulation; between simulated values of
+              d and of the size ratio the curves are interpolated linearly.
+          - id: one_parameter_at_a_time
+            kind: hard
+            equation: dn_model
+            text: d and the size ratio vary one at a time, each returning to its reference value before the 
+              other moves.
+          - id: simulation_label
+            kind: hard
+            text: Label the curves as a simulation with illustrative parameters, not as data.
+          - id: fixed_axes
+            kind: hard
+            text: Keep both axes fixed while a parameter varies.
+        timeline:
+          - id: growth
+            at_seconds: 0
+            tolerance_seconds: 0
+            kind: hard
+            instruction: The disc grows from 0 to 6 deg and the traces are drawn.
+          - id: d
+            at_seconds: 9.8
+            tolerance_seconds: 1
+            kind: preferred
+            instruction: d rises from 0.25 to 1 and returns.
+          - id: ratio
+            at_seconds: 16.4
+            tolerance_seconds: 1
+            kind: preferred
+            instruction: The size ratio falls from 4 to 1 and returns.
+        direction:
+          tone: Minimal, precise, scientific
+          avoid:
+            - Decorative flourishes
+            - Unlabeled axes
+            - Title cards
+        extensions: {}
+  touches_science: true
+applied_at: '2026-11-13T11:53:51+00:00'
+applied_to_revision: working
+diffs:
+  animation.yaml: ''
+scientific_review_required: true
+validation_warnings: []

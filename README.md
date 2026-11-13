@@ -21,6 +21,8 @@ styles/default/, styles/tomas_scientific/   manim8's own styles (the site styles
 fonts/                    Public Sans and Space Grotesk (SIL Open Font License) and the fontconfig file
                           the renders use, so the result does not depend on the machine's fonts
 families/website/         one manim8 project per clip, and the pinned render environment (uv.lock)
+families/website/components/   drawing code shared by clips (custom manim8 builders)
+sim/                      simulations that compute the curves some clips draw (prfmodel)
 tools/render.py           renders every clip in both styles and prepares the files for the site
 out/                      the prepared files (not committed)
 ```
@@ -29,7 +31,9 @@ out/                      the prepared files (not committed)
 
 | Project | Shows | Status |
 |---|---|---|
-| `divisive_normalization` | The DN pRF model of Aqil, Knapen and Dumoulin (2021): the activation constant b brings out surround suppression in the pRF profile; the normalization constant d sets the compression of the response function. | draft, awaiting scientific sign-off |
+| `dn_bar_sweep` | The DN pRF model of Aqil, Knapen and Dumoulin (2021) with both pools drawn on the pRF. A bar crosses the visual field; numerator (activation pool), denominator (normalization pool) and response are traced against the bar's position. Curves simulated with prfmodel. | draft, awaiting scientific sign-off |
+| `dn_size_tuning` | The same model with a disc growing around the pRF centre: the response peaks and then falls (oversaturation). The normalization constant d and the size ratio σ₂/σ₁ then vary one at a time. Curves simulated with prfmodel. | draft, awaiting scientific sign-off |
+| `divisive_normalization` | An earlier draft from the equation alone: the activation constant b and the pRF profile, the normalization constant d and the response function. No pools, no stimulus. | draft, likely superseded by the two above |
 
 ## Set up
 
@@ -66,6 +70,33 @@ python3 tools/render.py divisive_normalization --profile final --site ../tknapen
 The site then needs an entry for the clip in its `_data/clips.yml` (title and caption, with the size and
 length from `out/clips.yml`) and `{% include clip.html id="divisive-normalization" %}` on the page where it
 belongs. The dark render is picked up by itself.
+
+## Simulated curves
+
+The two `dn_` clips draw curves that are computed, not typed in. `sim/simulate_dn.py` runs prfmodel's
+`DivNormGaussian2DPRFModel` (no impulse response, no scaling) for a bar stepping across the field and for a
+disc growing around the pRF centre, and writes the numerator, the denominator and the response to each
+project's `data/` folder as CSV, with the parameters in `data/parameters.json`. The CSV files are committed,
+so rendering does not need prfmodel; rerun the simulation only to change parameters or stimuli.
+
+```bash
+uv venv --python 3.12 sim/.venv
+```
+
+```bash
+uv pip install --python sim/.venv/bin/python -r sim/requirements.txt
+```
+
+```bash
+KERAS_BACKEND=jax sim/.venv/bin/python sim/simulate_dn.py
+```
+
+`families/website/components/dn_views.py` draws them: the visual field with the pRF and its two pools on
+the left, the traces on the right. It is a manim8 `custom` builder that returns a parametric component, so
+`vary_parameter` actions move the stimulus, d and the size ratio. manim8 (at the pinned commit) accepts such
+an action on a custom object only if the object has a data binding whose transforms name parameters; each
+project therefore has a `data/controls.csv` of unit values that the binding scales by those parameters. It
+holds no data and can go once `custom` can declare parameters itself.
 
 ## Add a clip
 

@@ -1,0 +1,177 @@
+schema_version: '1.0'
+project_id: divisive_normalization
+based_on_animation_revision: working
+scenes:
+- id: profile
+  start_seconds: 0
+  end_seconds: 10.5
+  purpose: The activation constant b brings out a suppressive surround in the pRF profile.
+  patterns:
+  - sweep_with_readout
+  objects:
+  - id: profile_caption
+    kind: text_caption
+    style_role: foreground
+    params:
+      text: The pRF profile
+      role: body
+      anchor: top_left
+  - id: profile_note
+    kind: text_caption
+    style_role: secondary_text
+    params:
+      text: 'a larger b: surround suppression'
+      role: caption
+      below: profile_caption
+    reveal_at_seconds: 3.0
+  - id: profile_plot
+    kind: function_plot
+    style_role: primary_signal
+    equation:
+      id: dn_model
+    params:
+      x_label: position in the visual field (deg)
+      y_label: pRF profile
+      x_range:
+      - -5
+      - 5
+      y_range:
+      - -0.5
+      - 1.0
+      anchor: bottom_center
+      width_fraction: 0.84
+      height_fraction: 0.62
+      parameters:
+        a: 2
+        b: 0
+        c: 1
+        d: 1
+        sigma_1: 1
+        sigma_2: 2
+      series:
+      - label: zero
+        expression: 0 * x
+        style_role: muted
+      - label: pRF profile
+        expression: (a * exp(-x^2 / (2 * sigma_1^2)) + b) / (c * exp(-x^2 / (2 * sigma_2^2)) + d) - b / d
+        style_role: primary_signal
+      show_legend: false
+      data_label: simulated from the equation, illustrative values
+  - id: model_equation
+    kind: equation_block
+    style_role: foreground
+    equation:
+      id: dn_model
+      highlight:
+      - b
+    params:
+      anchor: top_right
+      scale: 0.9
+    reveal_at_seconds: 0.8
+  actions:
+  - id: raise_b
+    kind: vary_parameter
+    target: profile_plot
+    parameter: b
+    to: 0.5
+    at_seconds: 3.0
+    lead_in_seconds: 0.9
+    duration_seconds: 3.0
+    emphasize:
+    - model_equation
+  - id: lower_b
+    kind: vary_parameter
+    target: profile_plot
+    parameter: b
+    to: 0
+    at_seconds: 7.6
+    duration_seconds: 2.0
+    emphasize:
+    - model_equation
+  snapshots:
+  - id: profile_start
+    at_seconds: 2.0
+    description: The pRF profile for b = 0, positive everywhere, with labelled axes and the equation at the top right.
+  - id: profile_suppressed
+    at_seconds: 7.3
+    description: 'After the sweep b = 0.5: the profile dips below zero on both flanks; the axes are unchanged and the readout
+      shows b = 0.5.'
+- id: response
+  start_seconds: 10.5
+  end_seconds: 20
+  purpose: The normalization constant d sets how compressive the response function is.
+  patterns:
+  - sweep_with_readout
+  objects:
+  - id: response_caption
+    kind: text_caption
+    style_role: foreground
+    params:
+      text: The response function
+      role: body
+      anchor: top_left
+  - id: response_note
+    kind: text_caption
+    style_role: secondary_text
+    params:
+      text: 'a smaller d: compression'
+      role: caption
+      below: response_caption
+    reveal_at_seconds: 13.0
+  - id: response_plot
+    kind: function_plot
+    style_role: primary_signal
+    equation:
+      id: dn_model
+    params:
+      x_label: fraction of the pRFs stimulated
+      y_label: response
+      x_range:
+      - 0
+      - 1
+      y_range:
+      - 0
+      - 1.8
+      anchor: bottom_center
+      width_fraction: 0.84
+      height_fraction: 0.62
+      parameters:
+        a: 2
+        b: 0
+        c: 1
+        d: 3
+      series:
+      - label: response function
+        expression: (a * x + b) / (c * x + d) - b / d
+      show_legend: false
+      data_label: simulated from the equation, illustrative values
+  - id: model_equation_2
+    kind: equation_block
+    style_role: foreground
+    equation:
+      id: dn_model
+      highlight:
+      - d
+    params:
+      anchor: top_right
+      scale: 0.9
+  actions:
+  - id: lower_d
+    kind: vary_parameter
+    target: response_plot
+    parameter: d
+    to: 0.3
+    at_seconds: 13.0
+    lead_in_seconds: 0.9
+    duration_seconds: 4.0
+    emphasize:
+    - model_equation_2
+  snapshots:
+  - id: response_linear
+    at_seconds: 12.8
+    description: 'The response function for d = 3: nearly a straight line, with labelled axes and the equation at the top
+      right.'
+  - id: response_compressed
+    at_seconds: 19.2
+    description: 'After the sweep d = 0.3: the response rises steeply and then flattens; the axes are unchanged and the readout
+      shows d = 0.3.'

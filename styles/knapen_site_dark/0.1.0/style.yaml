@@ -1,0 +1,65 @@
+schema_version: '1.0'
+name: knapen_site_dark
+version: 0.1.0
+description: 'The Knapen Lab website, dark: the same sheet as knapen_site on the site''s dark page colour (#121316),
+  with the dark-mode values of its ink and theme colours. Colours and nothing else differ from knapen_site, so one
+  scene renders under both with the same timing.'
+inherits: default@0.5.0
+palette:
+  background: '#121316'
+  foreground: '#E8E9EC'
+  secondary_text: '#A4A8AF'
+  muted: '#6C717A'
+  neutral: '#2C2F34'
+  grid: '#1F2227'
+  primary_signal: '#3DB8C4'
+  primary_signal_soft: '#1F5A60'
+  uncertainty: '#1A3033'
+  selection: '#18292B'
+  emphasis: '#E2A74A'
+  comparison: '#F07A5F'
+  comparison_soft: '#6E392E'
+  warning: '#E2A74A'
+  normalization_pool: '#F07A5F'
+  theme_maps: '#F07A5F'
+  theme_imaging: '#E2A74A'
+  theme_models: '#3DB8C4'
+  theme_perception: '#A08CF0'
+typography:
+  body:
+    font_family: Public Sans
+    font_fallbacks: &id001
+    - DejaVu Sans
+    - sans-serif
+    size_px_at_1080p: 40
+  annotation:
+    font_family: Public Sans
+    font_fallbacks: *id001
+    size_px_at_1080p: 34
+  axis_label:
+    font_family: Public Sans
+    font_fallbacks: *id001
+    size_px_at_1080p: 34
+  tick_label:
+    font_family: Public Sans
+    font_fallbacks: *id001
+    size_px_at_1080p: 30
+  caption:
+    font_family: Public Sans
+    font_fallbacks: *id001
+    size_px_at_1080p: 30
+  title:
+    font_family: Space Grotesk
+    font_fallbacks:
+    - Public Sans
+    - DejaVu Sans
+    - sans-serif
+    size_px_at_1080p: 54
+    weight: bold
+  equation:
+    size_px_at_1080p: 52
+    label_size_px_at_1080p: 42
+  minimum_text_px_at_1080p: 30
+geometry:
+  curve_stroke_px_at_1080p: 3.6
+  axis_stroke_px_at_1080p: 1.8

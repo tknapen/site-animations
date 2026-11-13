@@ -1,0 +1,219 @@
+schema_version: '1.0'
+id: prop_create_storyboard
+kind: create_storyboard
+created_at: '2026-11-13T11:30:00+00:00'
+author: agent:claude
+summary: 'Storyboard: two scenes, the pRF profile with a sweep of b and the response function with a sweep of d.'
+rationale: First storyboard for the website clip described in references/brief.md, following the simulations of the paper's
+  Fig. 3 A and B.
+based_on_revision: working
+in_response_to: []
+uncertainties:
+- The exact formulas of the pRF profile P(x) and the response function R(s) in the paper's Methods were not readable to the
+  agent; the forms used follow from the model equation. The author should confirm them.
+- 'Parameter values are illustrative, not fitted: a = 2, c = 1, sigma_1 = 1 deg, sigma_2 = 2 deg; b from 0 to 0.5 with d =
+  1 for the profile; d from 3 to 0.3 with b = 0 for the response function. The paper''s Fig. 3 values were not available.'
+- The response function is shown with b = 0, because a nonzero b also changes its shape; the clip returns b to 0 before the
+  second scene so the two scenes are consistent.
+- Gaussians are written without their volume normalization (peak 1); the paper notes the amplitudes absorb that choice.
+claims:
+- statement: The DN pRF model's predicted response is (a G1·S + b)/(c G2·S + d) − b/d, with activation and normalization pRFs
+    G1 and G2 as isotropic Gaussians centred on the same position, with sizes sigma_1 and sigma_2, amplitudes a and c, an
+    activation constant b and a normalization constant d.
+  source_id: aqil2021
+  locator: Materials and Methods, 'pRF Models'; Fig. 1D. The typeset equation was not in the text available to the agent;
+    the form was taken from prfpy (Norm_Iso2DGaussianModel.return_prediction), the package the paper used.
+  basis: source
+- statement: A nonzero activation constant b is necessary for a suppressive centre-surround pRF profile, and increasing b
+    gives more pronounced suppression.
+  source_id: aqil2021
+  locator: Results, 'DN Model Constants Modulate Suppression and Compression'; Fig. 3A
+  basis: source
+- statement: 'The normalization constant d inversely modulates compression in the response function: higher d gives a more
+    linear response, lower d stronger compression.'
+  source_id: aqil2021
+  locator: Results, 'DN Model Constants Modulate Suppression and Compression'; Fig. 3B
+  basis: source
+- statement: The pRF profile is the model evaluated on a one-dimensional slice through the pRFs, P(x) = (a G1(x) + b)/(c G2(x)
+    + d) − b/d, and the response function is R(s) = (a s + b)/(c s + d) − b/d for a stimulated fraction s.
+  source_id: aqil2021
+  locator: Materials and Methods, 'PRF Profiles and Response Function'. The typeset formulas were not in the text available
+    to the agent; these forms are inferred from the model equation and the verbal definitions.
+  basis: inference
+touches_science: true
+targets:
+- file: storyboard.yaml
+  document:
+    schema_version: '1.0'
+    project_id: divisive_normalization
+    based_on_animation_revision: working
+    scenes:
+    - id: profile
+      start_seconds: 0
+      end_seconds: 10.5
+      purpose: The activation constant b brings out a suppressive surround in the pRF profile.
+      patterns:
+      - sweep_with_readout
+      objects:
+      - id: profile_caption
+        kind: text_caption
+        style_role: foreground
+        params:
+          text: The pRF profile
+          role: body
+          anchor: top_left
+      - id: profile_note
+        kind: text_caption
+        style_role: secondary_text
+        params:
+          text: 'a larger b: surround suppression'
+          role: caption
+          below: profile_caption
+        reveal_at_seconds: 2.6
+      - id: profile_plot
+        kind: function_plot
+        style_role: primary_signal
+        equation:
+          id: dn_model
+        params:
+          x_label: position in the visual field (deg)
+          y_label: pRF profile
+          x_range:
+          - -6
+          - 6
+          y_range:
+          - -0.3
+          - 1.1
+          anchor: center_left
+          width_fraction: 0.56
+          height_fraction: 0.6
+          parameters:
+            a: 2
+            b: 0
+            c: 1
+            d: 1
+            sigma_1: 1
+            sigma_2: 2
+          series:
+          - label: pRF profile
+            expression: (a * exp(-x^2 / (2 * sigma_1^2)) + b) / (c * exp(-x^2 / (2 * sigma_2^2)) + d) - b / d
+          show_legend: false
+          data_label: simulated from the equation, illustrative values
+      - id: model_equation
+        kind: equation_block
+        style_role: foreground
+        equation:
+          id: dn_model
+          highlight:
+          - b
+        params:
+          anchor: top_right
+          scale: 0.9
+        reveal_at_seconds: 0.8
+      actions:
+      - id: raise_b
+        kind: vary_parameter
+        target: profile_plot
+        parameter: b
+        to: 0.5
+        at_seconds: 2.6
+        lead_in_seconds: 0.9
+        duration_seconds: 3.2
+        emphasize:
+        - model_equation
+      - id: lower_b
+        kind: vary_parameter
+        target: profile_plot
+        parameter: b
+        to: 0
+        at_seconds: 8.0
+        duration_seconds: 2.0
+        emphasize:
+        - model_equation
+      snapshots:
+      - id: profile_start
+        at_seconds: 2.4
+        description: The pRF profile for b = 0, positive everywhere, with labelled axes and the equation at the top right.
+      - id: profile_suppressed
+        at_seconds: 7.6
+        description: 'After the sweep b = 0.5: the profile dips below zero on both flanks; the axes are unchanged and the
+          readout shows b = 0.5.'
+    - id: response
+      start_seconds: 10.5
+      end_seconds: 20
+      purpose: The normalization constant d sets how compressive the response function is.
+      patterns:
+      - sweep_with_readout
+      objects:
+      - id: response_caption
+        kind: text_caption
+        style_role: foreground
+        params:
+          text: The response function
+          role: body
+          anchor: top_left
+      - id: response_note
+        kind: text_caption
+        style_role: secondary_text
+        params:
+          text: 'a smaller d: compression'
+          role: caption
+          below: response_caption
+        reveal_at_seconds: 13.0
+      - id: response_plot
+        kind: function_plot
+        style_role: primary_signal
+        equation:
+          id: dn_model
+        params:
+          x_label: fraction of the pRFs stimulated
+          y_label: response
+          x_range:
+          - 0
+          - 1
+          y_range:
+          - 0
+          - 1.8
+          anchor: center_left
+          width_fraction: 0.56
+          height_fraction: 0.6
+          parameters:
+            a: 2
+            b: 0
+            c: 1
+            d: 3
+          series:
+          - label: response function
+            expression: (a * x + b) / (c * x + d) - b / d
+          show_legend: false
+          data_label: simulated from the equation, illustrative values
+      - id: model_equation_2
+        kind: equation_block
+        style_role: foreground
+        equation:
+          id: dn_model
+          highlight:
+          - d
+        params:
+          anchor: top_right
+          scale: 0.9
+      actions:
+      - id: lower_d
+        kind: vary_parameter
+        target: response_plot
+        parameter: d
+        to: 0.3
+        at_seconds: 13.0
+        lead_in_seconds: 0.9
+        duration_seconds: 4.0
+        emphasize:
+        - model_equation_2
+      snapshots:
+      - id: response_linear
+        at_seconds: 12.8
+        description: 'The response function for d = 3: nearly a straight line, with labelled axes and the equation at the
+          top right.'
+      - id: response_compressed
+        at_seconds: 19.2
+        description: 'After the sweep d = 0.3: the response rises steeply and then flattens; the axes are unchanged and the
+          readout shows d = 0.3.'

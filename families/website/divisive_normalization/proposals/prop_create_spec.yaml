@@ -1,0 +1,133 @@
+schema_version: '1.0'
+id: prop_create_spec
+kind: create_spec
+created_at: '2026-11-13T11:30:00+00:00'
+author: agent:claude
+summary: 'Specification: the DN pRF model equation, two hard claims (b and suppression, d and compression), 20 s at 2:1.'
+rationale: First storyboard for the website clip described in references/brief.md, following the simulations of the paper's
+  Fig. 3 A and B.
+based_on_revision: working
+in_response_to: []
+uncertainties:
+- The exact formulas of the pRF profile P(x) and the response function R(s) in the paper's Methods were not readable to the
+  agent; the forms used follow from the model equation. The author should confirm them.
+- 'Parameter values are illustrative, not fitted: a = 2, c = 1, sigma_1 = 1 deg, sigma_2 = 2 deg; b from 0 to 0.5 with d =
+  1 for the profile; d from 3 to 0.3 with b = 0 for the response function. The paper''s Fig. 3 values were not available.'
+- The response function is shown with b = 0, because a nonzero b also changes its shape; the clip returns b to 0 before the
+  second scene so the two scenes are consistent.
+- Gaussians are written without their volume normalization (peak 1); the paper notes the amplitudes absorb that choice.
+claims:
+- statement: The DN pRF model's predicted response is (a G1·S + b)/(c G2·S + d) − b/d, with activation and normalization pRFs
+    G1 and G2 as isotropic Gaussians centred on the same position, with sizes sigma_1 and sigma_2, amplitudes a and c, an
+    activation constant b and a normalization constant d.
+  source_id: aqil2021
+  locator: Materials and Methods, 'pRF Models'; Fig. 1D. The typeset equation was not in the text available to the agent;
+    the form was taken from prfpy (Norm_Iso2DGaussianModel.return_prediction), the package the paper used.
+  basis: source
+- statement: A nonzero activation constant b is necessary for a suppressive centre-surround pRF profile, and increasing b
+    gives more pronounced suppression.
+  source_id: aqil2021
+  locator: Results, 'DN Model Constants Modulate Suppression and Compression'; Fig. 3A
+  basis: source
+- statement: 'The normalization constant d inversely modulates compression in the response function: higher d gives a more
+    linear response, lower d stronger compression.'
+  source_id: aqil2021
+  locator: Results, 'DN Model Constants Modulate Suppression and Compression'; Fig. 3B
+  basis: source
+- statement: The pRF profile is the model evaluated on a one-dimensional slice through the pRFs, P(x) = (a G1(x) + b)/(c G2(x)
+    + d) − b/d, and the response function is R(s) = (a s + b)/(c s + d) − b/d for a stimulated fraction s.
+  source_id: aqil2021
+  locator: Materials and Methods, 'PRF Profiles and Response Function'. The typeset formulas were not in the text available
+    to the agent; these forms are inferred from the model equation and the verbal definitions.
+  basis: inference
+touches_science: true
+targets:
+- file: animation.yaml
+  document:
+    schema_version: '1.0'
+    id: divisive_normalization
+    title: 'Divisive normalization: one computation, two response signatures'
+    sources:
+    - id: aqil2021
+      type: markdown
+      path: references/aqil2021.md
+      role: scientific_reference
+      citation: Aqil M, Knapen T, Dumoulin SO (2021). Divisive normalization unifies disparate response signatures throughout
+        the human visual hierarchy. PNAS 118(46), e2108713118. doi:10.1073/pnas.2108713118
+    output:
+      duration_seconds: 20
+      width_px: 1920
+      height_px: 960
+      aspect_ratio: '2:1'
+      fps: 30
+      container: mp4
+      video_codec: h264
+      audio: none
+    style:
+      name: knapen_site
+      version: 0.1.0
+      overrides: {}
+    equations:
+    - id: dn_model
+      typst: r = (a thin G_1 dot.op S + b) / (c thin G_2 dot.op S + d) - b / d
+      latex: r = \frac{a\,G_1 \cdot S + b}{c\,G_2 \cdot S + d} - \frac{b}{d}
+      symbols:
+        r:
+          meaning: predicted neural response
+        S:
+          meaning: the stimulus
+        G_1:
+          meaning: activation pRF, a Gaussian of size sigma_1
+        G_2:
+          meaning: normalization pRF, a Gaussian of size sigma_2 at the same position
+        a:
+          meaning: activation amplitude
+        b:
+          meaning: activation constant
+        c:
+          meaning: normalization amplitude
+        d:
+          meaning: normalization constant
+    audience: graduate_neuroscience
+    objective: 'Show that the divisive normalization pRF model produces two response signatures with one computation: raising
+      the activation constant b brings out a suppressive surround in the pRF profile, and lowering the normalization constant
+      d makes the response function compressive.'
+    scientific_constraints:
+    - id: equation_as_published
+      kind: hard
+      equation: dn_model
+      text: 'Show the model equation as published: activation over normalization, minus b/d.'
+    - id: b_suppression
+      kind: hard
+      equation: dn_model
+      text: With b = 0 the pRF profile has no negative surround; raising b produces one. Other parameters stay fixed while
+        b moves.
+    - id: d_compression
+      kind: hard
+      equation: dn_model
+      text: Lowering d makes the response function more compressive; a high d gives a nearly linear response. Other parameters
+        stay fixed while d moves.
+    - id: simulation_label
+      kind: hard
+      text: Label the curves as simulations of the equation with illustrative parameter values, not as data.
+    - id: fixed_axes
+      kind: hard
+      text: Keep both axes fixed while a parameter varies.
+    timeline:
+    - id: profile
+      at_seconds: 0
+      tolerance_seconds: 0
+      kind: hard
+      instruction: The pRF profile with the equation.
+    - id: response
+      at_seconds: 10.5
+      tolerance_seconds: 1
+      kind: preferred
+      instruction: The response function with the equation.
+    direction:
+      tone: Minimal, precise, scientific
+      avoid:
+      - Decorative flourishes
+      - Unlabeled axes
+      - Title cards
+    extensions: {}

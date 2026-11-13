@@ -1,0 +1,65 @@
+schema_version: '1.0'
+name: knapen_site
+version: 0.1.0
+description: 'The Knapen Lab website, light: the site''s white page and graphite ink, Public Sans labels with Space
+  Grotesk titles, and the four research-theme colours of the site (assets/css/site.css) as signal colours. Text
+  is larger than in the lecture styles because a clip is shown about 900 px wide in a page.'
+inherits: default@0.5.0
+palette:
+  background: '#FFFFFF'
+  foreground: '#141518'
+  secondary_text: '#595C64'
+  muted: '#8B8F97'
+  neutral: '#E2E3E6'
+  grid: '#EEF0F2'
+  primary_signal: '#13838F'
+  primary_signal_soft: '#B5DADD'
+  uncertainty: '#DDEEEF'
+  selection: '#EEF6F7'
+  emphasis: '#B7791F'
+  comparison: '#D2452F'
+  comparison_soft: '#F2C4BB'
+  warning: '#B7791F'
+  normalization_pool: '#D2452F'
+  theme_maps: '#D2452F'
+  theme_imaging: '#B7791F'
+  theme_models: '#13838F'
+  theme_perception: '#6E56CF'
+typography:
+  body:
+    font_family: Public Sans
+    font_fallbacks: &id001
+    - DejaVu Sans
+    - sans-serif
+    size_px_at_1080p: 40
+  annotation:
+    font_family: Public Sans
+    font_fallbacks: *id001
+    size_px_at_1080p: 34
+  axis_label:
+    font_family: Public Sans
+    font_fallbacks: *id001
+    size_px_at_1080p: 34
+  tick_label:
+    font_family: Public Sans
+    font_fallbacks: *id001
+    size_px_at_1080p: 30
+  caption:
+    font_family: Public Sans
+    font_fallbacks: *id001
+    size_px_at_1080p: 30
+  title:
+    font_family: Space Grotesk
+    font_fallbacks:
+    - Public Sans
+    - DejaVu Sans
+    - sans-serif
+    size_px_at_1080p: 54
+    weight: bold
+  equation:
+    size_px_at_1080p: 52
+    label_size_px_at_1080p: 42
+  minimum_text_px_at_1080p: 30
+geometry:
+  curve_stroke_px_at_1080p: 3.6
+  axis_stroke_px_at_1080p: 1.8

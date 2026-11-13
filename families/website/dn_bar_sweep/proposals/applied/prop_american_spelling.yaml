@@ -1,0 +1,29 @@
+schema_version: '1.0'
+proposal:
+  schema_version: '1.0'
+  id: prop_american_spelling
+  kind: revise_storyboard
+  created_at: '2026-11-13T14:00:00+00:00'
+  author: agent:claude
+  summary: 'Axis label "bar center (deg)": the website uses American spelling.'
+  rationale: The clip sits in pages of tknapen.github.io, whose text and captions write "center".
+  based_on_revision: working
+  in_response_to: []
+  uncertainties: []
+  claims: []
+  targets:
+    - file: storyboard.yaml
+      patch:
+        - op: replace
+          path: /scenes/0/objects/2/params/arguments/x_label
+          value: bar center (deg)
+  touches_science: false
+applied_at: '2026-11-13T12:14:38+00:00'
+applied_to_revision: working
+diffs:
+  storyboard.yaml: "--- a/storyboard.yaml\n+++ b/storyboard.yaml\n@@ -48,7 +48,7 @@\n             mode: bar\n  \
+    \           table: data/bar_sweep.csv\n             parameters: data/parameters.json\n-            x_label:
+    bar centre (deg)\n+            x_label: bar center (deg)\n             y_label: model output (a.u.)\n      \
+    \       x_range:\n               - -8"
+scientific_review_required: false
+validation_warnings: []

@@ -44,7 +44,7 @@ class DnBarSweep(SnapshotScene):
              'arguments': {'mode': 'bar',
                            'table': 'data/bar_sweep.csv',
                            'parameters': 'data/parameters.json',
-                           'x_label': 'bar centre (deg)',
+                           'x_label': 'bar center (deg)',
                            'y_label': 'model output (a.u.)',
                            'x_range': [-8, 8, 4],
                            'y_range': [-0.2, 1.0, 0.2],

@@ -31,9 +31,9 @@ out/                      the prepared files (not committed)
 
 | Project | Shows | Status |
 |---|---|---|
-| `dn_bar_sweep` | The DN pRF model of Aqil, Knapen and Dumoulin (2021) with both pools drawn on the pRF. A bar crosses the visual field; numerator (activation pool), denominator (normalization pool) and response are traced against the bar's position. Curves simulated with prfmodel. | draft, awaiting scientific sign-off |
-| `dn_size_tuning` | The same model with a disc growing around the pRF centre: the response peaks and then falls (oversaturation). The normalization constant d and the size ratio σ₂/σ₁ then vary one at a time. Curves simulated with prfmodel. | draft, awaiting scientific sign-off |
-| `divisive_normalization` | An earlier draft from the equation alone: the activation constant b and the pRF profile, the normalization constant d and the response function. No pools, no stimulus. | draft, likely superseded by the two above |
+| `dn_bar_sweep` | The DN pRF model of Aqil, Knapen and Dumoulin (2021) with both pools drawn on the pRF. A bar crosses the visual field; numerator (activation pool), denominator (normalization pool) and response are traced against the bar's position. Curves simulated with prfmodel. | signed off by the author on 13 November 2026; final render in the website repository |
+| `dn_size_tuning` | The same model with a disc growing around the pRF centre: the response peaks and then falls (oversaturation). The normalization constant d and the size ratio σ₂/σ₁ then vary one at a time. Curves simulated with prfmodel. | signed off by the author on 13 November 2026; final render in the website repository |
+| `divisive_normalization` | An earlier draft from the equation alone: the activation constant b and the pRF profile, the normalization constant d and the response function. No pools, no stimulus. | draft, not on the website |
 
 ## Set up
 
